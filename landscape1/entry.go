@@ -1,4 +1,4 @@
-package assignment1
+package landscape1
 
 import "time"
 
@@ -28,4 +28,16 @@ type EntryStatus struct {
 	// Status - active/inactive
 	East string `json:"east"`
 	West string `json:"west"`
+}
+
+// Resources - listing of all hosts envoy or operations
+type Resources struct {
+	EntryId   int       `json:"entry-id"`
+	AgentId   string    `json:"agent-id"`
+	CreatedTS time.Time `json:"created-ts"`
+
+	// Assignment
+	Host string `json:"host"`
+	Type string `json:"type"` // agency vs operations
+
 }

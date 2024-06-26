@@ -8,7 +8,7 @@ const (
 	Ver2                  = "v2"
 	ObservationAccess     = "access"
 	ObservationInference  = "inference"
-	ObservationAssignment = "assignment1"
+	ObservationAssignment = "landscape1"
 )
 
 // Configuration keys used on startup for map values

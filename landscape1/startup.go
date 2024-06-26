@@ -1,4 +1,4 @@
-package assignment1
+package landscape1
 
 import (
 	"fmt"
