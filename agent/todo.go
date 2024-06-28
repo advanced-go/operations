@@ -1,6 +1,6 @@
-package host
+package agent
 
-// Architecture should support processing in failure of host scenarios
+// Architecture should support processing in failure of agent scenarios
 
 // Startup sequence
 // 1. Initialize agent to read list of resources/hosts, and start health checks.
