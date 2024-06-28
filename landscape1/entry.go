@@ -115,16 +115,10 @@ func validEntry(values url.Values, e Entry) bool {
 	if values == nil {
 		return false
 	}
-	if !isValid(values.Get(StatusKey), e.Status) {
-		return false
+	if isValid(values.Get(StatusKey), e.Status) && isValid(values.Get(TrafficKey), e.Traffic) && isValid(values.Get(AssignedRegionKey), e.AssignedRegion) {
+		return true
 	}
-	if !isValid(values.Get(TrafficKey), e.Traffic) {
-		return false
-	}
-	if !isValid(values.Get(AssignedRegionKey), e.AssignedRegion) {
-		return false
-	}
-	return true
+	return false
 }
 
 func isValid(value, target string) bool {
