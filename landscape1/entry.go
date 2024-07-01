@@ -132,16 +132,6 @@ func lastEntry() Entry {
 	return entryData[len(entryData)-1]
 }
 
-// EntryChange - add an agentID?
-type EntryChange struct {
-	Partition int       `json:"partition"`
-	AgentId   string    `json:"agent-id"`
-	CreatedTS time.Time `json:"created-ts"`
-
-	Item     string `json:"item"` // "status", "class", "region"
-	NewValue string `json:"new-value"`
-}
-
 // HostEntry - listing of all hosts
 type HostEntry struct {
 	EntryId   int       `json:"entry-id"`
