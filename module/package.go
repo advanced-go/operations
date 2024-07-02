@@ -1,13 +1,14 @@
 package module
 
 const (
-	Authority     = "github/advanced-go/operations"
-	RouteName     = "operations"
-	Version       = "2.2.2"
-	Ver1          = "v1"
-	Ver2          = "v2"
-	LandscapeRoot = "landscape"
-	ActivityRoot  = "activity"
+	Authority      = "github/advanced-go/operations"
+	RouteName      = "operations"
+	Version        = "2.2.2"
+	Ver1           = "v1"
+	Ver2           = "v2"
+	LandscapeRoot  = "landscape"
+	ActivityRoot   = "activity"
+	AssignmentRoot = "assignment"
 )
 
 // Configuration keys used on startup for map values

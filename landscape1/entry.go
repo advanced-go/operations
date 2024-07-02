@@ -37,7 +37,7 @@ var (
 	}
 )
 
-// Entry - agent
+// Entry - agency
 type Entry struct {
 	Partition int       `json:"partition"`
 	Region    string    `json:"region"`
@@ -45,7 +45,7 @@ type Entry struct {
 	SubZone   string    `json:"sub-zone"`
 	Traffic   string    `json:"traffic"`
 	Status    string    `json:"status"` // active or inactive
-	AgentId   string    `json:"agent-id"`
+	AgentId   string    `json:"agency-id"`
 	CreatedTS time.Time `json:"created-ts"`
 
 	AssigneeClass  string `json:"assignee-class"`
@@ -135,7 +135,7 @@ func lastEntry() Entry {
 // HostEntry - listing of all hosts
 type HostEntry struct {
 	EntryId   int       `json:"entry-id"`
-	AgentId   string    `json:"agent-id"`
+	AgentId   string    `json:"agency-id"`
 	CreatedTS time.Time `json:"created-ts"`
 
 	// Assignment

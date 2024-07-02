@@ -1,4 +1,4 @@
-package agent
+package agency
 
 // Changes to status or assigned region need to generate case officer changes to remove the old assignment
 // and create the new assignment

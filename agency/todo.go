@@ -1,6 +1,6 @@
-package agent
+package agency
 
-// Architecture should support processing in failure of agent scenarios
+// Architecture should support processing in failure of agency scenarios
 
 // Startup sequence
 //

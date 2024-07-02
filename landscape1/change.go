@@ -9,7 +9,7 @@ import "time"
 // EntryChange - add an agentID?
 type EntryChange struct {
 	Partition int       `json:"partition"`
-	AgentId   string    `json:"agent-id"`
+	AgentId   string    `json:"agency-id"`
 	CreatedTS time.Time `json:"created-ts"`
 
 	Item     string `json:"item"` // "status", "class", "region"

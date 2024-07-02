@@ -34,6 +34,8 @@ func Exchange(r *http.Request) (*http.Response, *core.Status) {
 		return activityExchange[core.Log](r, p)
 	case module.LandscapeRoot:
 		return landscapeExchange[core.Log](r, p)
+	case module.AssignmentRoot:
+		return assignmentExchange[core.Log](r, p)
 
 	case core.VersionPath:
 		return httpx.NewVersionResponse(module.Version), core.StatusOK()

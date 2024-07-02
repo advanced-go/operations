@@ -1,4 +1,4 @@
-package agent
+package agency
 
 // Assignment - process changes to the landscape and create the needed operational changes that Envoy can
 // query and reflect in the case officers

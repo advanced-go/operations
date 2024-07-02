@@ -18,14 +18,14 @@ const (
 var (
 	safeEntry = common.NewSafe()
 	entryData = []Entry{
-		{EntryId: 1, AgentId: "agent-id", Details: "testing 1-2-3", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{EntryId: 1, AgentId: "agency-id", Details: "testing 1-2-3", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
 	}
 )
 
-// Entry - agent
+// Entry - agency
 type Entry struct {
 	EntryId   int       `json:"entry-id"`
-	AgentId   string    `json:"agent-id"`
+	AgentId   string    `json:"agency-id"`
 	CreatedTS time.Time `json:"created-ts"`
 
 	Details string `json:"details"`

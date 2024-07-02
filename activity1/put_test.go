@@ -9,7 +9,7 @@ func ExamplePut() {
 	_, status := put[core.Output, Entry](nil, nil, activityResource, "", nil, nil)
 	fmt.Printf("test: put(nil,h,nil) -> [status:%v] [count:%v]\n", status, len(entryData))
 
-	_, status = put[core.Output, Entry](nil, nil, activityResource, "", []Entry{{AgentId: "new-agent-id"}}, nil)
+	_, status = put[core.Output, Entry](nil, nil, activityResource, "", []Entry{{AgentId: "new-agency-id"}}, nil)
 	fmt.Printf("test: put(nil,h,[]Entry) -> [status:%v] [count:%v]\n", status, len(entryData))
 
 	//Output:

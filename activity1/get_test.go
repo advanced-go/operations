@@ -17,6 +17,6 @@ func ExampleGet() {
 
 	//Output:
 	//test: get("region=*") -> [status:OK] [entries:1]
-	//test: get("region=*&order=desc") -> [status:OK] [entries:[{1 agent-id 2024-06-10 09:00:35 +0000 UTC testing 1-2-3}]]
+	//test: get("region=*&order=desc") -> [status:OK] [entries:[{1 agency-id 2024-06-10 09:00:35 +0000 UTC testing 1-2-3}]]
 
 }
