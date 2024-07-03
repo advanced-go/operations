@@ -29,6 +29,14 @@ type caseOfficer struct {
 
 // NewAgent - create a new case officer agent
 func NewAgent(uri string, interval time.Duration, partition landscape1.Entry, parent messaging.Agent) messaging.Agent {
+	return newAgent(uri, interval, partition, parent, func(body []activity1.Entry) *core.Status {
+		_, status := activity1.Put(nil, body)
+		return status
+	})
+}
+
+// newAgent - create a new case officer agent
+func newAgent(uri string, interval time.Duration, partition landscape1.Entry, parent messaging.Agent, log func(body []activity1.Entry) *core.Status) messaging.Agent {
 	c := new(caseOfficer)
 	c.uri = uri
 	c.agentId = class + ":" + uri
@@ -41,10 +49,7 @@ func NewAgent(uri string, interval time.Duration, partition landscape1.Entry, pa
 	c.ingressAgents = messaging.NewExchange()
 	c.egressAgents = messaging.NewExchange()
 
-	c.log = func(body []activity1.Entry) *core.Status {
-		_, status := activity1.Put(nil, body)
-		return status
-	}
+	c.log = log
 	return c
 }
 

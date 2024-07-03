@@ -45,3 +45,26 @@ func Put(r *http.Request, body []Entry) (h2 http.Header, status *core.Status) {
 func InsertStatus(ctx context.Context, origin core.Origin, status string) *core.Status {
 	return core.StatusOK()
 }
+
+// Post - resource POST, with optional content override
+func Post(r *http.Request, body []Entry, values url.Values) (h2 http.Header, entries []Entry, status *core.Status) {
+	if r == nil {
+		return nil, nil, core.NewStatusError(core.StatusInvalidArgument, errors.New("error: request is nil"))
+	}
+	if body == nil {
+		content, status1 := json2.New[[]Entry](r.Body, r.Header)
+		if !status1.OK() {
+			var e core.Log
+			e.Handle(status, core.RequestId(r.Header))
+			return nil, nil, status1
+		}
+		body = content
+	}
+	switch p := any(&body).(type) {
+	case *[]Entry:
+		h2, status = put[core.Log, Entry](r.Context(), core.AddRequestId(r.Header), assignmentResource, "", *p, nil)
+	default:
+		status = core.NewStatusError(http.StatusBadRequest, core.NewInvalidBodyTypeError(body))
+	}
+	return
+}

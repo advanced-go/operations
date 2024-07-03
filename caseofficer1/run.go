@@ -3,6 +3,7 @@ package caseofficer1
 import (
 	"github.com/advanced-go/operations/activity1"
 	"github.com/advanced-go/operations/assignment1"
+	"github.com/advanced-go/operations/landscape1"
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
 	"net/url"
@@ -10,12 +11,12 @@ import (
 )
 
 // run - case officer run function
-func run(c *caseOfficer, fnTick func(officer *caseOfficer) ([]assignment1.Entry, *core.Status)) {
+func run(c *caseOfficer, update func(partition landscape1.Entry) ([]assignment1.Entry, *core.Status)) {
 	if c == nil {
 		return
 	}
-	if fnTick == nil {
-		fnTick = onTick
+	if update == nil {
+		update = updateAssignments
 	}
 	tick := time.Tick(c.interval)
 	for {
@@ -25,7 +26,7 @@ func run(c *caseOfficer, fnTick func(officer *caseOfficer) ([]assignment1.Entry,
 			if !status.OK() {
 				c.parent.Message(messaging.NewMessageWithStatus(messaging.ChannelData, "to", "from", "event", status))
 			}
-			entries, status1 := fnTick(c)
+			entries, status1 := update(c.partition)
 			if !status1.OK() {
 				c.parent.Message(messaging.NewMessageWithStatus(messaging.ChannelData, "to", "from", "event", status1))
 			}
@@ -46,12 +47,12 @@ func run(c *caseOfficer, fnTick func(officer *caseOfficer) ([]assignment1.Entry,
 	}
 }
 
-func onTick(c *caseOfficer) ([]assignment1.Entry, *core.Status) {
+func updateAssignments(partition landscape1.Entry) ([]assignment1.Entry, *core.Status) {
 	values := make(url.Values)
-	values.Add(core.RegionKey, c.partition.Region)
-	values.Add(core.ZoneKey, c.partition.Zone)
-	values.Add(core.SubZoneKey, c.partition.SubZone)
-	values.Add("traffic", c.partition.Traffic)
-	entries, _, status := assignment1.Get(nil, nil, values)
-	return entries, status
+	values.Add(core.RegionKey, partition.Region)
+	values.Add(core.ZoneKey, partition.Zone)
+	values.Add(core.SubZoneKey, partition.SubZone)
+	values.Add("traffic", partition.Traffic)
+	//_, entries, status := assignment1.Post(nil, nil, values)
+	return []assignment1.Entry{}, core.StatusOK()
 }
