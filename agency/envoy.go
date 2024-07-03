@@ -9,8 +9,10 @@ package agency
 //              to the appropriate case officers
 
 // Startup sequence.
-// 1. Read assignments and create case officers for each assignment
-// 1b. Periodically poll for changes in assignments
+// 1. Read partitions and create case officers for each partition
+// 1a. Create a status channel for each case officer that is used for communication, such as database errors.
+// 1b. If database is down, communicate directly to center via HTTP
+// 1c. Periodically poll for changes in assignments
 // 2. Determine which assignments are active and activate case officers
 // 3. Determine if a new case officer class is available and start conversions.
 // 4. Update assignments whenever a case officer class is converted.

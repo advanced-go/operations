@@ -5,7 +5,21 @@ package agency
 // When a partition is added, then the assignments should be generated.
 // A corresponding case officer change should be generated
 
+// How does a case officer status check an agent?
+// 1. Send a message via the Agents Exchange
+// How does an agent communicate with its case officer?
+// 1. Send a message via the Status channel provided to the agent on assignment
+//    This message would mainly be an error status, such as a database error.
+//    Other statuses could include changes in database observation timing
+//    These statuses should be persisted to the database.
+
 // Case officer responsibilities
+// Startup
+// 1. Read existing assignments.
+// 2. If no assignments, then create them
+// Processing
+// 1. Look for new services/assignments
+// 2. Look for agents that appear to be tombstone or not actively processing
 
 // Operations - provide the following functionality related to partitions
 // 1. Assign
@@ -14,7 +28,3 @@ package agency
 // 4. Resume
 // 5. Start
 // 6. Stop
-
-// Functionality related to processing
-// 1. Look for new services/assignments
-// 2. Look for agents that appear to be tombstone or not actively processing
