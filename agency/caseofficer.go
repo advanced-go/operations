@@ -20,6 +20,7 @@ package agency
 // Processing
 // 1. Look for new services/assignments
 // 2. Look for agents that appear to be tombstone or not actively processing
+// 3. Process status messages from agents
 
 // Operations - provide the following functionality related to partitions
 // 1. Assign

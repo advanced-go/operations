@@ -6,3 +6,4 @@ package agency
 // 1. Read hosts, and process health checks on server and database.
 //
 // 2. Handle assignment health checks such as assignment error statuses
+// 3. Listen to requests from Envoy when database is down.
