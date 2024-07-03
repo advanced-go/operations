@@ -1,5 +1,3 @@
-package agency
-
 // Changes to status or assigned region need to generate case officer changes to remove the old assignment
 // and create the new assignment
 // When a partition is added, then the assignments should be generated.
