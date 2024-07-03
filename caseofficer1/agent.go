@@ -99,7 +99,10 @@ func (c *caseOfficer) Shutdown() {
 	if c.shutdown != nil {
 		c.shutdown()
 	}
-	c.Message(messaging.NewControlMessage(c.uri, c.uri, messaging.ShutdownEvent))
+	if c.agentCh != nil {
+		c.agentCh <- messaging.NewControlMessage(c.uri, c.uri, messaging.ShutdownEvent)
+	}
+	//c.Message(messaging.NewControlMessage(c.uri, c.uri, messaging.ShutdownEvent))
 }
 
 // Run - run the agent
@@ -109,5 +112,6 @@ func (c *caseOfficer) Run() {
 	}
 	//TODO : start status processing
 	//TODO : read all existing assignments and create agents
-	//TODO : start run function
+	
+	go run(c, nil)
 }
