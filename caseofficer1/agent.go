@@ -102,7 +102,6 @@ func (c *caseOfficer) Shutdown() {
 	if c.agentCh != nil {
 		c.agentCh <- messaging.NewControlMessage(c.uri, c.uri, messaging.ShutdownEvent)
 	}
-	//c.Message(messaging.NewControlMessage(c.uri, c.uri, messaging.ShutdownEvent))
 }
 
 // Run - run the agent
