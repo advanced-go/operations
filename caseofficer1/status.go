@@ -10,13 +10,13 @@ import (
 )
 
 // run - case officer run function
-func runStatus(c *caseOfficer, ctrl, status <-chan *messaging.Message, log func(body []activity1.Entry) *core.Status, insert func(msg *messaging.Message) *core.Status) {
+func runStatus(c *caseOfficer, log func(body []activity1.Entry) *core.Status, insert func(msg *messaging.Message) *core.Status) {
 	if c == nil {
 		return
 	}
 	for {
 		select {
-		case msg, open1 := <-status:
+		case msg, open1 := <-c.statusC:
 			if !open1 {
 				return
 			}
@@ -29,7 +29,7 @@ func runStatus(c *caseOfficer, ctrl, status <-chan *messaging.Message, log func(
 					c.parent.Message(messaging.NewStatusMessage("", "", "", status1))
 				}
 			}
-		case msg, open := <-ctrl:
+		case msg, open := <-c.ctrlC:
 			if !open {
 				return
 			}

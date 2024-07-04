@@ -11,12 +11,7 @@ import (
 )
 
 // run - case officer run function.
-// The following fields are required for the *caseOfficer
-// 1. interval
-// 2. uri
-// 3. parent
-// 4. partition
-func run(c *caseOfficer, ctrl <-chan *messaging.Message, log func(body []activity1.Entry) *core.Status, update func(partition landscape1.Entry) ([]assignment1.Entry, *core.Status)) {
+func run(c *caseOfficer, log func(body []activity1.Entry) *core.Status, update func(partition landscape1.Entry) ([]assignment1.Entry, *core.Status)) {
 	if c == nil {
 		return
 	}
@@ -29,7 +24,7 @@ func run(c *caseOfficer, ctrl <-chan *messaging.Message, log func(body []activit
 			if !status.OK() && !status.NotFound() {
 				c.parent.Message(messaging.NewStatusMessage("", "", "", status))
 			}
-		case msg, open := <-ctrl:
+		case msg, open := <-c.ctrlC:
 			if !open {
 				return
 			}

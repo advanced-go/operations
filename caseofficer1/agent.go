@@ -41,6 +41,11 @@ func AgentUriFromAssignment(entry landscape1.Entry) string {
 
 // NewAgent - create a new case officer agent
 func NewAgent(uri string, interval time.Duration, partition landscape1.Entry, parent messaging.Agent) messaging.Agent {
+	return newAgent(uri, interval, partition, parent)
+}
+
+// newAgent - create a new case officer agent
+func newAgent(uri string, interval time.Duration, partition landscape1.Entry, parent messaging.Agent) *caseOfficer {
 	c := new(caseOfficer)
 	c.uri = uri
 	c.interval = interval
@@ -110,6 +115,6 @@ func (c *caseOfficer) Run() {
 	if c.running {
 		return
 	}
-	go runStatus(c, c.statusCtrlC, c.statusC, logStatusActivity, insertAssignmentStatus)
-	go run(c, c.ctrlC, logActivity, updateAssignments)
+	go runStatus(c, logStatusActivity, insertAssignmentStatus)
+	go run(c, logActivity, updateAssignments)
 }
