@@ -112,6 +112,6 @@ func (c *caseOfficer) Run() {
 	}
 	//TODO : start status processing
 	//TODO : read all existing assignments and create agents
-	
+
 	go run(c, nil)
 }

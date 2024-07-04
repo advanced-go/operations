@@ -2,6 +2,7 @@ package assignment1
 
 import (
 	"context"
+	"github.com/advanced-go/operations/common"
 	"github.com/advanced-go/operations/module"
 	"github.com/advanced-go/postgresql/pgxsql"
 	"github.com/advanced-go/stdlib/core"
@@ -28,12 +29,12 @@ func get[E core.ErrorHandler, T pgxsql.Scanner[T]](ctx context.Context, h http.H
 	return
 }
 
-func testQuery[T pgxsql.Scanner[T]](_ context.Context, _ http.Header, _, _ string, _ map[string][]string, _ ...any) (entries []T, status *core.Status) {
+func testQuery[T pgxsql.Scanner[T]](_ context.Context, _ http.Header, _, _ string, values map[string][]string, _ ...any) (entries []T, status *core.Status) {
 	status = core.StatusOK()
 	switch p := any(&entries).(type) {
 	case *[]Entry:
 		defer safeEntry.Lock()()
-		*p = append(*p, entryData...)
+		*p, status = common.FilterT[Entry](values, entryData, validEntry)
 	default:
 		status = core.NewStatusError(http.StatusBadRequest, core.NewInvalidBodyTypeError(entries))
 	}

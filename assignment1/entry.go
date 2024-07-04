@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/advanced-go/operations/common"
+	"github.com/advanced-go/stdlib/core"
+	"net/url"
 	"time"
 )
 
@@ -30,7 +32,7 @@ var (
 		{Region: "us-west1", Zone: "a", Host: "www.host2.com", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
 		{Region: "us-central1", Zone: "c", Host: "www.host1.com", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
 		{Region: "us-central1", Zone: "c", Host: "www.host2.com", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
-		{Region: "us-central1", Zone: "c", Host: "www.host3.com", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Region: "us-central1", Zone: "d", Host: "www.host4.com", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
 	}
 )
 
@@ -87,4 +89,17 @@ func (Entry) Rows(entries []Entry) [][]any {
 		values = append(values, e.Values())
 	}
 	return values
+}
+
+func validEntry(values url.Values, e Entry) bool {
+	if values == nil {
+		return false
+	}
+	filter := core.NewOrigin(values)
+	target := core.Origin{Region: e.Region, Zone: e.Zone, SubZone: e.SubZone, Host: e.Host}
+	if !core.OriginMatch(target, filter) {
+		return false
+	}
+	// Additional filtering
+	return true
 }

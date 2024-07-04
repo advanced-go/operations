@@ -28,12 +28,14 @@ const (
 var (
 	safeEntry = common.NewSafe()
 	entryData = []Entry{
-		{Partition: 1, Region: "us-west1", Zone: "a", SubZone: "", Traffic: "ingress", Status: "active", AssigneeClass: "ingress-case-class1", AssignedRegion: "west", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Partition: 1, Region: "us-west1", Zone: "a", SubZone: "", Traffic: "ingress", Status: "active", AssigneeClass: "ingress-case-class1", AssignedRegion: "east", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
 		{Partition: 2, Region: "us-west1", Zone: "b", SubZone: "", Traffic: "egress", Status: "active", AssigneeClass: "egress-case-class1", AssignedRegion: "east", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
 		{Partition: 3, Region: "us-south1", Zone: "b", SubZone: "", Traffic: "ingress", Status: "active", AssigneeClass: "ingress-case-class1", AssignedRegion: "east", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
 		{Partition: 4, Region: "us-south1", Zone: "c", SubZone: "", Traffic: "egress", Status: "active", AssigneeClass: "egress-case-class1", AssignedRegion: "east", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
 		{Partition: 5, Region: "us-central1", Zone: "c", SubZone: "", Traffic: "ingress", Status: "active", AssigneeClass: "ingress-case-class1", AssignedRegion: "west", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
-		{Partition: 6, Region: "us-central1", Zone: "d", SubZone: "", Traffic: "egress", Status: "active", AssigneeClass: "egress-case-class1", AssignedRegion: "east", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Partition: 6, Region: "us-central1", Zone: "c", SubZone: "", Traffic: "egress", Status: "active", AssigneeClass: "ingress-case-class1", AssignedRegion: "west", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Partition: 7, Region: "us-central1", Zone: "d", SubZone: "", Traffic: "ingress", Status: "active", AssigneeClass: "egress-case-class1", AssignedRegion: "west", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Partition: 8, Region: "us-central1", Zone: "d", SubZone: "", Traffic: "egress", Status: "active", AssigneeClass: "egress-case-class1", AssignedRegion: "west", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
 	}
 )
 
