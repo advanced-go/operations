@@ -115,6 +115,7 @@ func (c *caseOfficer) Run() {
 	if c.running {
 		return
 	}
+	c.running = true
 	go runStatus(c, logStatusActivity, insertAssignmentStatus)
 	go run(c, logActivity, updateAssignments)
 }
