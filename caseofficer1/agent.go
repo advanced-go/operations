@@ -1,55 +1,57 @@
 package caseofficer1
 
 import (
-	"github.com/advanced-go/operations/activity1"
+	"fmt"
 	"github.com/advanced-go/operations/landscape1"
-	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
 	"time"
 )
 
 const (
-	class = "case-officer"
+	Class = "case-officer"
 )
 
 type caseOfficer struct {
 	running       bool
 	uri           string
-	agentId       string
 	interval      time.Duration
 	partition     landscape1.Entry
-	agentCh       chan *messaging.Message
-	statusCh      chan *messaging.Message
+	ctrlC         chan *messaging.Message
+	statusCtrlC   chan *messaging.Message
+	statusC       chan *messaging.Message
 	parent        messaging.Agent
 	ingressAgents *messaging.Exchange
 	egressAgents  *messaging.Exchange
 	shutdown      func()
-	log           func(body []activity1.Entry) *core.Status
+}
+
+func AgentUri(traffic, region, zone, subZone string) string {
+	if subZone == "" {
+		return fmt.Sprintf("%v:%v.%v.%v", Class, traffic, region, zone)
+	}
+	return fmt.Sprintf("%v:%v.%v.%v.%v", Class, traffic, region, zone, subZone)
+}
+
+func AgentUriFromAssignment(entry landscape1.Entry) string {
+	if entry.SubZone == "" {
+		return fmt.Sprintf("%v:%v.%v.%v", Class, entry.Traffic, entry.Region, entry.Zone)
+	}
+	return fmt.Sprintf("%v:%v.%v.%v.%v", Class, entry.Traffic, entry.Region, entry.Zone, entry.SubZone)
 }
 
 // NewAgent - create a new case officer agent
 func NewAgent(uri string, interval time.Duration, partition landscape1.Entry, parent messaging.Agent) messaging.Agent {
-	return newAgent(uri, interval, partition, parent, func(body []activity1.Entry) *core.Status {
-		_, status := activity1.Put(nil, body)
-		return status
-	})
-}
-
-// newAgent - create a new case officer agent
-func newAgent(uri string, interval time.Duration, partition landscape1.Entry, parent messaging.Agent, log func(body []activity1.Entry) *core.Status) messaging.Agent {
 	c := new(caseOfficer)
 	c.uri = uri
-	c.agentId = class + ":" + uri
 	c.interval = interval
 	c.partition = partition
 
-	c.agentCh = make(chan *messaging.Message, messaging.ChannelSize)
-	c.statusCh = make(chan *messaging.Message, messaging.ChannelSize)
+	c.ctrlC = make(chan *messaging.Message, messaging.ChannelSize)
+	c.statusCtrlC = make(chan *messaging.Message, messaging.ChannelSize)
+	c.statusC = make(chan *messaging.Message, messaging.ChannelSize)
 	c.parent = parent
 	c.ingressAgents = messaging.NewExchange()
 	c.egressAgents = messaging.NewExchange()
-
-	c.log = log
 	return c
 }
 
@@ -64,13 +66,8 @@ func (c *caseOfficer) Uri() string {
 }
 
 // Message - message the agent
-func (c *caseOfficer) Message(msg *messaging.Message) {
-	if msg == nil {
-		return
-	}
-	if msg.Channel() == messaging.ChannelControl && c.agentCh != nil {
-		c.agentCh <- msg
-	}
+func (c *caseOfficer) Message(m *messaging.Message) {
+	messaging.Mux(m, c.ctrlC, nil, c.statusC)
 }
 
 // Add - add a shutdown function
@@ -99,8 +96,12 @@ func (c *caseOfficer) Shutdown() {
 	if c.shutdown != nil {
 		c.shutdown()
 	}
-	if c.agentCh != nil {
-		c.agentCh <- messaging.NewControlMessage(c.uri, c.uri, messaging.ShutdownEvent)
+	msg := messaging.NewControlMessage(c.uri, c.uri, messaging.ShutdownEvent)
+	if c.ctrlC != nil {
+		c.ctrlC <- msg
+	}
+	if c.statusCtrlC != nil {
+		c.statusCtrlC <- msg
 	}
 }
 
@@ -109,8 +110,6 @@ func (c *caseOfficer) Run() {
 	if c.running {
 		return
 	}
-	//TODO : start status processing
-	//TODO : read all existing assignments and create agents
-
-	go run(c, nil)
+	go runStatus(c, c.statusCtrlC, c.statusC, logStatusActivity, insertAssignmentStatus)
+	go run(c, c.ctrlC, logActivity, updateAssignments)
 }

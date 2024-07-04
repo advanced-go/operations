@@ -42,7 +42,7 @@ func Put(r *http.Request, body []Entry) (h2 http.Header, status *core.Status) {
 	return
 }
 
-func InsertStatus(ctx context.Context, origin core.Origin, status string) *core.Status {
+func InsertStatus(ctx context.Context, values url.Values, status *core.Status) *core.Status {
 	return core.StatusOK()
 }
 
