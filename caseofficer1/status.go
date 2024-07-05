@@ -9,7 +9,7 @@ import (
 	"net/url"
 )
 
-// run - case officer run function
+// run - status processing
 func runStatus(c *caseOfficer, log func(body []activity1.Entry) *core.Status, insert func(msg *messaging.Message) *core.Status) {
 	if c == nil {
 		return
@@ -22,11 +22,11 @@ func runStatus(c *caseOfficer, log func(body []activity1.Entry) *core.Status, in
 			}
 			status1 := log([]activity1.Entry{{AgentId: c.uri}})
 			if !status1.OK() {
-				c.parent.Message(messaging.NewStatusMessage("", "", "", status1))
+				c.handler.Message(messaging.NewStatusMessage("", "", "", status1))
 			} else {
 				status1 = insert(msg)
 				if !status1.OK() && !status1.NotFound() {
-					c.parent.Message(messaging.NewStatusMessage("", "", "", status1))
+					c.handler.Message(messaging.NewStatusMessage("", "", "", status1))
 				}
 			}
 		case msg, open := <-c.ctrlC:
@@ -54,9 +54,4 @@ func insertAssignmentStatus(msg *messaging.Message) *core.Status {
 		return assignment1.InsertStatus(nil, values, status)
 	}
 	return core.NewStatusError(core.StatusInvalidArgument, errors.New("message body content is not of type *core.Status"))
-}
-
-func logStatusActivity(body []activity1.Entry) *core.Status {
-	_, status := activity1.Put(nil, body)
-	return status
 }

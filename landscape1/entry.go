@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/advanced-go/operations/common"
+	"github.com/advanced-go/stdlib/core"
 	"net/url"
 	"time"
 )
@@ -111,6 +112,16 @@ func (Entry) Rows(entries []Entry) [][]any {
 		values = append(values, e.Values())
 	}
 	return values
+}
+
+func (e Entry) Origin() core.Origin {
+	return core.Origin{
+		Region:     e.Region,
+		Zone:       e.Zone,
+		SubZone:    e.SubZone,
+		Host:       "",
+		InstanceId: "",
+	}
 }
 
 func validEntry(values url.Values, e Entry) bool {

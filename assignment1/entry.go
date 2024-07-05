@@ -91,6 +91,16 @@ func (Entry) Rows(entries []Entry) [][]any {
 	return values
 }
 
+func (e Entry) Origin() core.Origin {
+	return core.Origin{
+		Region:     e.Region,
+		Zone:       e.Zone,
+		SubZone:    e.SubZone,
+		Host:       e.Host,
+		InstanceId: "",
+	}
+}
+
 func validEntry(values url.Values, e Entry) bool {
 	if values == nil {
 		return false

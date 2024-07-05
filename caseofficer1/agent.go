@@ -3,6 +3,7 @@ package caseofficer1
 import (
 	"fmt"
 	"github.com/advanced-go/operations/landscape1"
+	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
 	"time"
 )
@@ -19,39 +20,38 @@ type caseOfficer struct {
 	ctrlC         chan *messaging.Message
 	statusCtrlC   chan *messaging.Message
 	statusC       chan *messaging.Message
-	parent        messaging.Agent
+	handler       messaging.Agent
 	ingressAgents *messaging.Exchange
 	egressAgents  *messaging.Exchange
 	shutdown      func()
 }
 
-func AgentUri(traffic, region, zone, subZone string) string {
-	if subZone == "" {
-		return fmt.Sprintf("%v:%v.%v.%v", Class, traffic, region, zone)
+func AgentUri(traffic string, origin core.Origin) string {
+	if origin.SubZone == "" {
+		return fmt.Sprintf("%v:%v.%v.%v", Class, traffic, origin.Region, origin.Zone)
 	}
-	return fmt.Sprintf("%v:%v.%v.%v.%v", Class, traffic, region, zone, subZone)
+	return fmt.Sprintf("%v:%v.%v.%v.%v", Class, traffic, origin.Region, origin.Zone, origin.SubZone)
 }
 
 func AgentUriFromAssignment(e landscape1.Entry) string {
-	return AgentUri(e.Traffic, e.Region, e.Zone, e.SubZone)
+	return AgentUri(e.Traffic, e.Origin())
 }
 
 // NewAgent - create a new case officer agent
-func NewAgent(interval time.Duration, partition landscape1.Entry, parent messaging.Agent) messaging.Agent {
-	return newAgent(interval, partition, parent)
+func NewAgent(interval time.Duration, partition landscape1.Entry, handler messaging.Agent) messaging.Agent {
+	return newAgent(interval, partition, handler)
 }
 
 // newAgent - create a new case officer agent
-func newAgent(interval time.Duration, partition landscape1.Entry, parent messaging.Agent) *caseOfficer {
+func newAgent(interval time.Duration, partition landscape1.Entry, handler messaging.Agent) *caseOfficer {
 	c := new(caseOfficer)
 	c.uri = AgentUriFromAssignment(partition)
 	c.interval = interval
 	c.partition = partition
-
 	c.ctrlC = make(chan *messaging.Message, messaging.ChannelSize)
 	c.statusCtrlC = make(chan *messaging.Message, messaging.ChannelSize)
-	c.statusC = make(chan *messaging.Message, messaging.ChannelSize)
-	c.parent = parent
+	c.statusC = make(chan *messaging.Message, 3*messaging.ChannelSize)
+	c.handler = handler
 	c.ingressAgents = messaging.NewExchange()
 	c.egressAgents = messaging.NewExchange()
 	return c
@@ -75,22 +75,6 @@ func (c *caseOfficer) Message(m *messaging.Message) {
 // Add - add a shutdown function
 func (c *caseOfficer) Add(f func()) {
 	c.shutdown = messaging.AddShutdown(c.shutdown, f)
-	/*
-		if f == nil {
-			return
-		}
-		if c.shutdown == nil {
-			c.shutdown = f
-		} else {
-			// !panic
-			prev := c.shutdown
-			c.shutdown = func() {
-				prev()
-				f()
-			}
-		}
-
-	*/
 }
 
 // Shutdown - shutdown the agent
@@ -117,6 +101,6 @@ func (c *caseOfficer) Run() {
 		return
 	}
 	c.running = true
-	go runStatus(c, logStatusActivity, insertAssignmentStatus)
-	go run(c, logActivity, updateAssignments)
+	go runStatus(c, logActivity, insertAssignmentStatus)
+	go run(c, logActivity, updateAssignments, newControllerAgent)
 }

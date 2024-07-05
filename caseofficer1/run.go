@@ -1,17 +1,20 @@
 package caseofficer1
 
 import (
+	"github.com/advanced-go/agency/egress1"
+	"github.com/advanced-go/agency/ingress1"
 	"github.com/advanced-go/operations/activity1"
 	"github.com/advanced-go/operations/assignment1"
 	"github.com/advanced-go/operations/landscape1"
+	"github.com/advanced-go/stdlib/access"
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
 	"net/url"
 	"time"
 )
 
-// run - case officer run function.
-func run(c *caseOfficer, log func(body []activity1.Entry) *core.Status, update func(partition landscape1.Entry) ([]assignment1.Entry, *core.Status)) {
+// run - case officer
+func run(c *caseOfficer, log func(body []activity1.Entry) *core.Status, update func(partition landscape1.Entry) ([]assignment1.Entry, *core.Status), agent func(traffic string, entry assignment1.Entry, parent messaging.Agent) messaging.Agent) {
 	if c == nil {
 		return
 	}
@@ -20,9 +23,9 @@ func run(c *caseOfficer, log func(body []activity1.Entry) *core.Status, update f
 	for {
 		select {
 		case <-tick:
-			status := processAssignments(c, log, update)
+			status := processAssignments(c, log, update, agent)
 			if !status.OK() && !status.NotFound() {
-				c.parent.Message(messaging.NewStatusMessage("", "", "", status))
+				c.handler.Message(messaging.NewStatusMessage("", "", "", status))
 			}
 		case msg, open := <-c.ctrlC:
 			if !open {
@@ -36,9 +39,9 @@ func run(c *caseOfficer, log func(body []activity1.Entry) *core.Status, update f
 		default:
 			if !init {
 				init = true
-				status := processAssignments(c, log, update)
+				status := processAssignments(c, log, update, agent)
 				if !status.OK() && !status.NotFound() {
-					c.parent.Message(messaging.NewStatusMessage("", "", "", status))
+					c.handler.Message(messaging.NewStatusMessage("", "", "", status))
 				}
 			}
 		}
@@ -59,7 +62,7 @@ func logActivity(body []activity1.Entry) *core.Status {
 	return status
 }
 
-func processAssignments(c *caseOfficer, log func(body []activity1.Entry) *core.Status, update func(partition landscape1.Entry) ([]assignment1.Entry, *core.Status)) *core.Status {
+func processAssignments(c *caseOfficer, log func(body []activity1.Entry) *core.Status, update func(partition landscape1.Entry) ([]assignment1.Entry, *core.Status), newAgent func(traffic string, entry assignment1.Entry, parent messaging.Agent) messaging.Agent) *core.Status {
 	status := log([]activity1.Entry{{AgentId: c.uri}})
 	if !status.OK() {
 		return status
@@ -68,7 +71,16 @@ func processAssignments(c *caseOfficer, log func(body []activity1.Entry) *core.S
 	if !status1.OK() {
 		return status
 	}
-	if len(entries) > 0 {
+	for _, e := range entries {
+		c.ingressAgents.Register(newAgent(access.IngressTraffic, e, c.handler))
+		c.egressAgents.Register(newAgent(access.EgressTraffic, e, c.handler))
 	}
 	return status
+}
+
+func newControllerAgent(traffic string, entry assignment1.Entry, parent messaging.Agent) messaging.Agent {
+	if traffic == access.IngressTraffic {
+		return ingress1.NewAgent(entry.Origin(), parent)
+	}
+	return egress1.NewAgent(entry.Origin(), parent)
 }
