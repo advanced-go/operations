@@ -44,14 +44,14 @@ func runStatus(c *caseOfficer, log func(body []activity1.Entry) *core.Status, in
 }
 
 func insertAssignmentStatus(msg *messaging.Message) *core.Status {
+	status := msg.Status()
+	if status == nil {
+		return core.NewStatusError(core.StatusInvalidArgument, errors.New("message body content is not of type *core.Status"))
+	}
 	values := make(url.Values)
-	//if msg.Header.Get("Content-Type") != core.C
 	values.Add(core.RegionKey, msg.Header.Get(core.RegionKey))
 	values.Add(core.ZoneKey, msg.Header.Get(core.ZoneKey))
 	values.Add(core.SubZoneKey, msg.Header.Get(core.SubZoneKey))
 	values.Add(core.HostKey, msg.Header.Get(core.HostKey))
-	if status, ok := msg.Body.(*core.Status); ok {
-		return assignment1.InsertStatus(nil, values, status)
-	}
-	return core.NewStatusError(core.StatusInvalidArgument, errors.New("message body content is not of type *core.Status"))
+	return assignment1.InsertStatus(nil, values, status)
 }
