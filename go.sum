@@ -10,6 +10,8 @@ github.com/advanced-go/stdlib v0.0.0-20240704143545-9ea9051116c2 h1:4z6GkyGJB+Uq
 github.com/advanced-go/stdlib v0.0.0-20240704143545-9ea9051116c2/go.mod h1:bvuWc7Tx57LArgrEvbPxKW4hvIYGS3pw7iG4P6xofoQ=
 github.com/advanced-go/stdlib v0.0.0-20240704164523-a01a29919afc h1:Y9+RHtFMzQRBcvR1NC4y88vHn/qPjnbK6/wUyCy/zzY=
 github.com/advanced-go/stdlib v0.0.0-20240704164523-a01a29919afc/go.mod h1:bvuWc7Tx57LArgrEvbPxKW4hvIYGS3pw7iG4P6xofoQ=
+github.com/advanced-go/stdlib v0.0.0-20240705132939-297ed830c9bd h1:x8MXp6zW+zJqwzOmopTMV68IBZ1wWUEkUt27o9oKFh0=
+github.com/advanced-go/stdlib v0.0.0-20240705132939-297ed830c9bd/go.mod h1:bvuWc7Tx57LArgrEvbPxKW4hvIYGS3pw7iG4P6xofoQ=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

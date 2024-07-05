@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	Class = "case-officer"
+	Class = "case-officer1"
 )
 
 type caseOfficer struct {
@@ -32,22 +32,19 @@ func AgentUri(traffic, region, zone, subZone string) string {
 	return fmt.Sprintf("%v:%v.%v.%v.%v", Class, traffic, region, zone, subZone)
 }
 
-func AgentUriFromAssignment(entry landscape1.Entry) string {
-	if entry.SubZone == "" {
-		return fmt.Sprintf("%v:%v.%v.%v", Class, entry.Traffic, entry.Region, entry.Zone)
-	}
-	return fmt.Sprintf("%v:%v.%v.%v.%v", Class, entry.Traffic, entry.Region, entry.Zone, entry.SubZone)
+func AgentUriFromAssignment(e landscape1.Entry) string {
+	return AgentUri(e.Traffic, e.Region, e.Zone, e.SubZone)
 }
 
 // NewAgent - create a new case officer agent
-func NewAgent(uri string, interval time.Duration, partition landscape1.Entry, parent messaging.Agent) messaging.Agent {
-	return newAgent(uri, interval, partition, parent)
+func NewAgent(interval time.Duration, partition landscape1.Entry, parent messaging.Agent) messaging.Agent {
+	return newAgent(interval, partition, parent)
 }
 
 // newAgent - create a new case officer agent
-func newAgent(uri string, interval time.Duration, partition landscape1.Entry, parent messaging.Agent) *caseOfficer {
+func newAgent(interval time.Duration, partition landscape1.Entry, parent messaging.Agent) *caseOfficer {
 	c := new(caseOfficer)
-	c.uri = uri
+	c.uri = AgentUriFromAssignment(partition)
 	c.interval = interval
 	c.partition = partition
 
@@ -77,19 +74,23 @@ func (c *caseOfficer) Message(m *messaging.Message) {
 
 // Add - add a shutdown function
 func (c *caseOfficer) Add(f func()) {
-	if f == nil {
-		return
-	}
-	if c.shutdown == nil {
-		c.shutdown = f
-	} else {
-		// !panic
-		prev := c.shutdown
-		c.shutdown = func() {
-			prev()
-			f()
+	c.shutdown = messaging.AddShutdown(c.shutdown, f)
+	/*
+		if f == nil {
+			return
 		}
-	}
+		if c.shutdown == nil {
+			c.shutdown = f
+		} else {
+			// !panic
+			prev := c.shutdown
+			c.shutdown = func() {
+				prev()
+				f()
+			}
+		}
+
+	*/
 }
 
 // Shutdown - shutdown the agent

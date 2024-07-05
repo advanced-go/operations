@@ -10,8 +10,8 @@ func ExampleAgentUri() {
 	fmt.Printf("test: AgentUri() -> [%v]\n", u)
 
 	//Output:
-	//test: AgentUri() -> [case-officer:ingress.us-central1.c.sub-zone]
-	//test: AgentUri() -> [case-officer:egress.us-west1.a]
+	//test: AgentUri() -> [case-officer1:ingress.us-central1.c.sub-zone]
+	//test: AgentUri() -> [case-officer1:egress.us-west1.a]
 
 }
 
