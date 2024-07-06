@@ -1,8 +1,6 @@
 package logistics1
 
 import (
-	"fmt"
-	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
 )
 
@@ -24,17 +22,6 @@ type envoy struct {
 	shutdown func()
 }
 
-func AgentUri(traffic string, origin core.Origin) string {
-	if origin.SubZone == "" {
-		return fmt.Sprintf("%v:%v.%v.%v", Class, traffic, origin.Region, origin.Zone)
-	}
-	return fmt.Sprintf("%v:%v.%v.%v.%v", Class, traffic, origin.Region, origin.Zone, origin.SubZone)
-}
-
-//func AgentUriFromAssignment(e landscape1.Entry) string {
-//	return AgentUri(e.Traffic, e.Origin())
-//}
-
 // NewEnvoyAgent - create a new envoy agent
 func NewEnvoyAgent() messaging.Agent {
 	return newEnvoyAgent()
@@ -43,7 +30,7 @@ func NewEnvoyAgent() messaging.Agent {
 // newEnvoyAgent - create a new envoy agent
 func newEnvoyAgent() *envoy {
 	c := new(envoy)
-	c.uri = "" //AgentUriFromAssignment(partition)
+	c.uri = Class
 	//c.interval = interval
 	c.ctrlC = make(chan *messaging.Message, messaging.ChannelSize)
 	//c.statusCtrlC = make(chan *messaging.Message, messaging.ChannelSize)
