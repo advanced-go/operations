@@ -2,7 +2,6 @@ package caseofficer1
 
 import (
 	"fmt"
-	"github.com/advanced-go/operations/landscape1"
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
 	"time"
@@ -13,17 +12,17 @@ const (
 )
 
 type caseOfficer struct {
-	running       bool
-	uri           string
-	interval      time.Duration
-	partition     landscape1.Entry
-	ctrlC         chan *messaging.Message
-	statusCtrlC   chan *messaging.Message
-	statusC       chan *messaging.Message
-	handler       messaging.Agent
-	ingressAgents *messaging.Exchange
-	egressAgents  *messaging.Exchange
-	shutdown      func()
+	running          bool
+	uri              string
+	interval         time.Duration
+	traffic          string
+	origin           core.Origin
+	ctrlC            chan *messaging.Message
+	statusCtrlC      chan *messaging.Message
+	statusC          chan *messaging.Message
+	handler          messaging.Agent
+	controllerAgents *messaging.Exchange
+	shutdown         func()
 }
 
 func AgentUri(traffic string, origin core.Origin) string {
@@ -33,27 +32,24 @@ func AgentUri(traffic string, origin core.Origin) string {
 	return fmt.Sprintf("%v:%v.%v.%v.%v", Class, traffic, origin.Region, origin.Zone, origin.SubZone)
 }
 
-func AgentUriFromAssignment(e landscape1.Entry) string {
-	return AgentUri(e.Traffic, e.Origin())
-}
-
 // NewAgent - create a new case officer agent
-func NewAgent(interval time.Duration, partition landscape1.Entry, handler messaging.Agent) messaging.Agent {
-	return newAgent(interval, partition, handler)
+func NewAgent(interval time.Duration, traffic string, origin core.Origin, handler messaging.Agent) messaging.Agent {
+	return newCaseAgent(interval, traffic, origin, handler)
 }
 
-// newAgent - create a new case officer agent
-func newAgent(interval time.Duration, partition landscape1.Entry, handler messaging.Agent) *caseOfficer {
+// newCaseAgent - create a new case officer agent
+func newCaseAgent(interval time.Duration, traffic string, origin core.Origin, handler messaging.Agent) *caseOfficer {
 	c := new(caseOfficer)
-	c.uri = AgentUriFromAssignment(partition)
+	c.uri = AgentUri(traffic, origin)
+	c.traffic = traffic
+	c.origin = origin
 	c.interval = interval
-	c.partition = partition
+
 	c.ctrlC = make(chan *messaging.Message, messaging.ChannelSize)
 	c.statusCtrlC = make(chan *messaging.Message, messaging.ChannelSize)
 	c.statusC = make(chan *messaging.Message, 3*messaging.ChannelSize)
 	c.handler = handler
-	c.ingressAgents = messaging.NewExchange()
-	c.egressAgents = messaging.NewExchange()
+	c.controllerAgents = messaging.NewExchange()
 	return c
 }
 
@@ -93,6 +89,7 @@ func (c *caseOfficer) Shutdown() {
 	if c.statusCtrlC != nil {
 		c.statusCtrlC <- msg
 	}
+	// TODO : Need to shutdown controller agents.
 }
 
 // Run - run the agent
@@ -102,5 +99,5 @@ func (c *caseOfficer) Run() {
 	}
 	c.running = true
 	go runStatus(c, logActivity, insertAssignmentStatus)
-	go run(c, logActivity, updateAssignments, newControllerAgent)
+	go run(c, logActivity, updateAssignments, newAgent)
 }

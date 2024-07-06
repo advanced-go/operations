@@ -9,8 +9,10 @@ import (
 	"net/url"
 )
 
+type insertFunc func(msg *messaging.Message) *core.Status
+
 // run - status processing
-func runStatus(c *caseOfficer, log func(body []activity1.Entry) *core.Status, insert func(msg *messaging.Message) *core.Status) {
+func runStatus(c *caseOfficer, log logFunc, insert insertFunc) {
 	if c == nil {
 		return
 	}
@@ -35,6 +37,8 @@ func runStatus(c *caseOfficer, log func(body []activity1.Entry) *core.Status, in
 			}
 			switch msg.Event() {
 			case messaging.ShutdownEvent:
+				close(c.statusC)
+				close(c.statusCtrlC)
 				return
 			default:
 			}

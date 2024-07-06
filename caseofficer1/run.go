@@ -5,7 +5,6 @@ import (
 	"github.com/advanced-go/agency/ingress1"
 	"github.com/advanced-go/operations/activity1"
 	"github.com/advanced-go/operations/assignment1"
-	"github.com/advanced-go/operations/landscape1"
 	"github.com/advanced-go/stdlib/access"
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
@@ -13,8 +12,12 @@ import (
 	"time"
 )
 
+type logFunc func(body []activity1.Entry) *core.Status
+type updateFunc func(traffic string, origin core.Origin) ([]assignment1.Entry, *core.Status)
+type agentFunc func(traffic string, entry assignment1.Entry, handler messaging.Agent) messaging.Agent
+
 // run - case officer
-func run(c *caseOfficer, log func(body []activity1.Entry) *core.Status, update func(partition landscape1.Entry) ([]assignment1.Entry, *core.Status), agent func(traffic string, entry assignment1.Entry, parent messaging.Agent) messaging.Agent) {
+func run(c *caseOfficer, log logFunc, update updateFunc, agent agentFunc) {
 	if c == nil {
 		return
 	}
@@ -33,6 +36,7 @@ func run(c *caseOfficer, log func(body []activity1.Entry) *core.Status, update f
 			}
 			switch msg.Event() {
 			case messaging.ShutdownEvent:
+				close(c.ctrlC)
 				return
 			default:
 			}
@@ -48,11 +52,12 @@ func run(c *caseOfficer, log func(body []activity1.Entry) *core.Status, update f
 	}
 }
 
-func updateAssignments(partition landscape1.Entry) ([]assignment1.Entry, *core.Status) {
+func updateAssignments(traffic string, origin core.Origin) ([]assignment1.Entry, *core.Status) {
 	values := make(url.Values)
-	values.Add(core.RegionKey, partition.Region)
-	values.Add(core.ZoneKey, partition.Zone)
-	values.Add(core.SubZoneKey, partition.SubZone)
+	values.Add("traffic", traffic)
+	values.Add(core.RegionKey, origin.Region)
+	values.Add(core.ZoneKey, origin.Zone)
+	values.Add(core.SubZoneKey, origin.SubZone)
 	entries, _, status := assignment1.Get(nil, nil, values)
 	return entries, status
 }
@@ -62,25 +67,24 @@ func logActivity(body []activity1.Entry) *core.Status {
 	return status
 }
 
-func processAssignments(c *caseOfficer, log func(body []activity1.Entry) *core.Status, update func(partition landscape1.Entry) ([]assignment1.Entry, *core.Status), newAgent func(traffic string, entry assignment1.Entry, parent messaging.Agent) messaging.Agent) *core.Status {
+func processAssignments(c *caseOfficer, log logFunc, update updateFunc, newAgent agentFunc) *core.Status {
 	status := log([]activity1.Entry{{AgentId: c.uri}})
 	if !status.OK() {
 		return status
 	}
-	entries, status1 := update(c.partition)
+	entries, status1 := update(c.traffic, c.origin)
 	if !status1.OK() {
 		return status
 	}
 	for _, e := range entries {
-		c.ingressAgents.Register(newAgent(access.IngressTraffic, e, c.handler))
-		c.egressAgents.Register(newAgent(access.EgressTraffic, e, c.handler))
+		c.controllerAgents.Register(newAgent(c.traffic, e, c.handler))
 	}
 	return status
 }
 
-func newControllerAgent(traffic string, entry assignment1.Entry, parent messaging.Agent) messaging.Agent {
+func newAgent(traffic string, entry assignment1.Entry, handler messaging.Agent) messaging.Agent {
 	if traffic == access.IngressTraffic {
-		return ingress1.NewAgent(entry.Origin(), parent)
+		return ingress1.NewAgent(entry.Origin(), handler)
 	}
-	return egress1.NewAgent(entry.Origin(), parent)
+	return egress1.NewAgent(entry.Origin(), handler)
 }

@@ -21,6 +21,6 @@
 go.work
 go.work.sum
 
-#Intellij
+# Intellij
 *.idea
 

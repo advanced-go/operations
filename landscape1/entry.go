@@ -144,15 +144,3 @@ func isValid(value, target string) bool {
 func lastEntry() Entry {
 	return entryData[len(entryData)-1]
 }
-
-// HostEntry - listing of all hosts
-type HostEntry struct {
-	EntryId   int       `json:"entry-id"`
-	AgentId   string    `json:"agency-id"`
-	CreatedTS time.Time `json:"created-ts"`
-
-	// Assignment
-	Host string `json:"host"`
-	Type string `json:"type"` // backbone vs operations
-
-}
