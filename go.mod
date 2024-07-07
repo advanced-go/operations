@@ -3,7 +3,7 @@ module github.com/advanced-go/operations
 go 1.21.4
 
 require (
-	github.com/advanced-go/agency v0.0.0-20240705153641-c9b88a61fe06
+	github.com/advanced-go/agency v0.0.0-20240706115051-1a056dfe35cf
 	github.com/advanced-go/postgresql v0.0.0-20240616075129-fc362725c643
 	github.com/advanced-go/stdlib v0.0.0-20240707123351-65e3e3f5496d
 )

@@ -1,12 +1,9 @@
 package caseofficer1
 
 import (
-	"errors"
 	"github.com/advanced-go/operations/activity1"
-	"github.com/advanced-go/operations/assignment1"
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
-	"net/url"
 )
 
 type insertFunc func(msg *messaging.Message) *core.Status
@@ -45,17 +42,4 @@ func runStatus(c *caseOfficer, log logFunc, insert insertFunc) {
 		default:
 		}
 	}
-}
-
-func insertAssignmentStatus(msg *messaging.Message) *core.Status {
-	status := msg.Status()
-	if status == nil {
-		return core.NewStatusError(core.StatusInvalidArgument, errors.New("message body content is not of type *core.Status"))
-	}
-	values := make(url.Values)
-	values.Add(core.RegionKey, msg.Header.Get(core.RegionKey))
-	values.Add(core.ZoneKey, msg.Header.Get(core.ZoneKey))
-	values.Add(core.SubZoneKey, msg.Header.Get(core.SubZoneKey))
-	values.Add(core.HostKey, msg.Header.Get(core.HostKey))
-	return assignment1.InsertStatus(nil, values, status)
 }
