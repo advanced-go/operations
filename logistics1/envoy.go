@@ -2,6 +2,7 @@ package logistics1
 
 import (
 	"github.com/advanced-go/stdlib/messaging"
+	"time"
 )
 
 const (
@@ -9,11 +10,11 @@ const (
 )
 
 type envoy struct {
-	running bool
-	uri     string
-	//interval      time.Duration
-	//partition     landscape1.Entry
-	ctrlC chan *messaging.Message
+	running             bool
+	uri                 string
+	interval            time.Duration
+	caseOfficerInterval time.Duration
+	ctrlC               chan *messaging.Message
 	//statusCtrlC   chan *messaging.Message
 	//statusC       chan *messaging.Message
 	//handler       messaging.Agent
@@ -31,11 +32,9 @@ func NewEnvoyAgent() messaging.Agent {
 func newEnvoyAgent() *envoy {
 	c := new(envoy)
 	c.uri = Class
-	//c.interval = interval
+	c.interval = time.Second * 5
+	c.caseOfficerInterval = time.Second * 5
 	c.ctrlC = make(chan *messaging.Message, messaging.ChannelSize)
-	//c.statusCtrlC = make(chan *messaging.Message, messaging.ChannelSize)
-	//c.statusC = make(chan *messaging.Message, 3*messaging.ChannelSize)
-	//c.handler = handler
 	c.caseOfficers = messaging.NewExchange()
 	return c
 }

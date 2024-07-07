@@ -7,6 +7,6 @@ func ExampleLastEntry() {
 	fmt.Printf("test: lastEntry() -> [entry:%v]\n", lastEntry().Partition)
 
 	//Output:
-	//test: lastEntry() -> [entry:6]
+	//test: lastEntry() -> [entry:8]
 
 }

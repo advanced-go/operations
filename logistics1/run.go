@@ -12,7 +12,7 @@ import (
 )
 
 type logFunc func(body []activity1.Entry) *core.Status
-type agentFunc func(interval time.Duration, entry landscape1.Entry, handler messaging.Agent) messaging.Agent
+type agentFunc func(interval time.Duration, traffic string, origin core.Origin, handler messaging.Agent) messaging.Agent
 
 // run - operations envoy
 func run(e *envoy, log logFunc, agent agentFunc) {
@@ -20,18 +20,19 @@ func run(e *envoy, log logFunc, agent agentFunc) {
 		return
 	}
 	init := false
-	tick := time.Tick(time.Second * 5)
+	tick := time.Tick(e.interval)
 
 	for {
 		select {
 		case <-tick:
-
+			// TODO : determine how to check for partition changes
 		case msg, open := <-e.ctrlC:
 			if !open {
 				return
 			}
 			switch msg.Event() {
 			case messaging.ShutdownEvent:
+				close(e.ctrlC)
 				return
 			default:
 			}
@@ -61,10 +62,6 @@ func logActivity(body []activity1.Entry) *core.Status {
 	return status
 }
 
-func newAgent(interval time.Duration, entry landscape1.Entry, handler messaging.Agent) messaging.Agent {
-	return caseofficer1.NewAgent(interval, entry.Traffic, entry.Origin(), handler)
-}
-
 func processPartitions(c *envoy, log logFunc, newAgent agentFunc) *core.Status {
 	status := log([]activity1.Entry{{AgentId: c.uri}})
 	if !status.OK() {
@@ -78,4 +75,8 @@ func processPartitions(c *envoy, log logFunc, newAgent agentFunc) *core.Status {
 	//		c.controllerAgents.Register(newAgent(c.traffic, e, c.handler))
 	//	}
 	return status
+}
+
+func newAgent(interval time.Duration, traffic string, origin core.Origin, handler messaging.Agent) messaging.Agent {
+	return caseofficer1.NewAgent(interval, traffic, origin, handler)
 }
