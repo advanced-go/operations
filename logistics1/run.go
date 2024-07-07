@@ -2,7 +2,6 @@ package logistics1
 
 import (
 	"github.com/advanced-go/operations/activity1"
-	"github.com/advanced-go/operations/assignment1"
 	"github.com/advanced-go/operations/caseofficer1"
 	"github.com/advanced-go/operations/landscape1"
 	"github.com/advanced-go/stdlib/core"
@@ -13,9 +12,10 @@ import (
 
 type logFunc func(body []activity1.Entry) *core.Status
 type agentFunc func(interval time.Duration, traffic string, origin core.Origin, handler messaging.Agent) messaging.Agent
+type getFunc func(region string) ([]landscape1.Entry, *core.Status)
 
 // run - operations envoy
-func run(e *envoy, log logFunc, agent agentFunc) {
+func run(e *envoy, log logFunc, get getFunc, agent agentFunc) {
 	if e == nil {
 		return
 	}
@@ -39,22 +39,14 @@ func run(e *envoy, log logFunc, agent agentFunc) {
 		default:
 			if !init {
 				init = true
-				processPartitions(e, log, agent)
-				//if !status.OK() && !status.NotFound() {
-				//	   c.handler.Message(messaging.NewStatusMessage("", "", "", status))
-				//  }
+				status := processAssignments(e, log, get, agent)
+				if !status.OK() && !status.NotFound() {
+					log([]activity1.Entry{{AgentId: e.uri, Details: status.Err.Error()}})
+					// TODO : how to handle log error
+				}
 			}
 		}
 	}
-}
-
-func updateAssignments(partition landscape1.Entry) ([]assignment1.Entry, *core.Status) {
-	values := make(url.Values)
-	values.Add(core.RegionKey, partition.Region)
-	values.Add(core.ZoneKey, partition.Zone)
-	values.Add(core.SubZoneKey, partition.SubZone)
-	entries, _, status := assignment1.Get(nil, nil, values)
-	return entries, status
 }
 
 func logActivity(body []activity1.Entry) *core.Status {
@@ -62,18 +54,25 @@ func logActivity(body []activity1.Entry) *core.Status {
 	return status
 }
 
-func processPartitions(c *envoy, log logFunc, newAgent agentFunc) *core.Status {
-	status := log([]activity1.Entry{{AgentId: c.uri}})
+func getAssignments(region string) ([]landscape1.Entry, *core.Status) {
+	values := make(url.Values)
+	values.Add(landscape1.AssignedRegionKey, region)
+	values.Add(landscape1.StatusKey, landscape1.StatusActive)
+	return landscape1.Get(nil, nil, values)
+}
+
+func processAssignments(e *envoy, log logFunc, get getFunc, newAgent agentFunc) *core.Status {
+	status := log([]activity1.Entry{{AgentId: e.uri}})
 	if !status.OK() {
 		return status
 	}
-	//entries, status1 := update(c.traffic, c.origin)
-	//if !status1.OK() {
-	//		return status/
-	//	}
-	//	for _, e := range entries {
-	//		c.controllerAgents.Register(newAgent(c.traffic, e, c.handler))
-	//	}
+	entries, status1 := get(e.region)
+	if !status1.OK() {
+		return status1
+	}
+	for _, e1 := range entries {
+		e.caseOfficers.Register(newAgent(e.caseOfficerInterval, e1.Traffic, e1.Origin(), e))
+	}
 	return status
 }
 

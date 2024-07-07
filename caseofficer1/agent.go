@@ -12,17 +12,17 @@ const (
 )
 
 type caseOfficer struct {
-	running          bool
-	uri              string
-	interval         time.Duration
-	traffic          string
-	origin           core.Origin
-	ctrlC            chan *messaging.Message
-	statusCtrlC      chan *messaging.Message
-	statusC          chan *messaging.Message
-	handler          messaging.Agent
-	controllerAgents *messaging.Exchange
-	shutdown         func()
+	running     bool
+	uri         string
+	interval    time.Duration
+	traffic     string
+	origin      core.Origin
+	ctrlC       chan *messaging.Message
+	statusCtrlC chan *messaging.Message
+	statusC     chan *messaging.Message
+	handler     messaging.Agent
+	controllers *messaging.Exchange
+	shutdown    func()
 }
 
 func AgentUri(traffic string, origin core.Origin) string {
@@ -49,7 +49,7 @@ func newCaseAgent(interval time.Duration, traffic string, origin core.Origin, ha
 	c.statusCtrlC = make(chan *messaging.Message, messaging.ChannelSize)
 	c.statusC = make(chan *messaging.Message, 3*messaging.ChannelSize)
 	c.handler = handler
-	c.controllerAgents = messaging.NewExchange()
+	c.controllers = messaging.NewExchange()
 	return c
 }
 

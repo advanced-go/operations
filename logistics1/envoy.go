@@ -12,15 +12,12 @@ const (
 type envoy struct {
 	running             bool
 	uri                 string
+	region              string
 	interval            time.Duration
 	caseOfficerInterval time.Duration
 	ctrlC               chan *messaging.Message
-	//statusCtrlC   chan *messaging.Message
-	//statusC       chan *messaging.Message
-	//handler       messaging.Agent
-	caseOfficers *messaging.Exchange
-	//egressAgents  *messaging.Exchange
-	shutdown func()
+	caseOfficers        *messaging.Exchange
+	shutdown            func()
 }
 
 // NewEnvoyAgent - create a new envoy agent
@@ -32,6 +29,8 @@ func NewEnvoyAgent() messaging.Agent {
 func newEnvoyAgent() *envoy {
 	c := new(envoy)
 	c.uri = Class
+	// Needs to be set via host environment
+	c.region = "west"
 	c.interval = time.Second * 5
 	c.caseOfficerInterval = time.Second * 5
 	c.ctrlC = make(chan *messaging.Message, messaging.ChannelSize)
@@ -40,47 +39,47 @@ func newEnvoyAgent() *envoy {
 }
 
 // String - identity
-func (c *envoy) String() string {
-	return c.uri
+func (e *envoy) String() string {
+	return e.uri
 }
 
 // Uri - agent identifier
-func (c *envoy) Uri() string {
-	return c.uri
+func (e *envoy) Uri() string {
+	return e.uri
 }
 
 // Message - message the agent
-func (c *envoy) Message(m *messaging.Message) {
-	messaging.Mux(m, c.ctrlC, nil, nil)
+func (e *envoy) Message(m *messaging.Message) {
+	messaging.Mux(m, e.ctrlC, nil, nil)
 }
 
 // Add - add a shutdown function
-func (c *envoy) Add(f func()) {
-	c.shutdown = messaging.AddShutdown(c.shutdown, f)
+func (e *envoy) Add(f func()) {
+	e.shutdown = messaging.AddShutdown(e.shutdown, f)
 }
 
 // Shutdown - shutdown the agent
-func (c *envoy) Shutdown() {
-	if !c.running {
+func (e *envoy) Shutdown() {
+	if !e.running {
 		return
 	}
-	c.running = false
-	if c.shutdown != nil {
-		c.shutdown()
+	e.running = false
+	if e.shutdown != nil {
+		e.shutdown()
 	}
-	msg := messaging.NewControlMessage(c.uri, c.uri, messaging.ShutdownEvent)
-	if c.ctrlC != nil {
-		c.ctrlC <- msg
+	msg := messaging.NewControlMessage(e.uri, e.uri, messaging.ShutdownEvent)
+	if e.ctrlC != nil {
+		e.ctrlC <- msg
 	}
-	// TODO : need to shutdown case officers
+	e.caseOfficers.Broadcast(msg)
 }
 
 // Run - run the agent
-func (c *envoy) Run() {
-	if c.running {
+func (e *envoy) Run() {
+	if e.running {
 		return
 	}
-	c.running = true
+	e.running = true
 
-	go run(c, logActivity, newAgent)
+	go run(e, logActivity, getAssignments, newAgent)
 }

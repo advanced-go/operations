@@ -8,11 +8,11 @@ import (
 
 func ExampleGet() {
 	q := "status=active"
-	entries, _, status := get[core.Output, Entry](nil, nil, uri.BuildValues(q), partitionResource, "", nil)
+	entries, status := get[core.Output, Entry](nil, nil, uri.BuildValues(q), partitionResource, "", nil)
 	fmt.Printf("test: get(\"%v\") -> [status:%v] [entries:%v]\n", q, status, len(entries))
 
 	q = "assigned-region=west&status=active&traffic=ingress"
-	entries, _, status = get[core.Output, Entry](nil, nil, uri.BuildValues(q), partitionResource, "", nil)
+	entries, status = get[core.Output, Entry](nil, nil, uri.BuildValues(q), partitionResource, "", nil)
 	fmt.Printf("test: get(\"%v\") -> [status:%v] [entries:%v]\n", q, status, entries)
 
 	//Output:

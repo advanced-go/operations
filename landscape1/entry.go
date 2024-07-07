@@ -22,6 +22,7 @@ const (
 	AssignedRegionName = "assigned_region"
 
 	StatusKey         = "status"
+	StatusActive      = "active"
 	TrafficKey        = "traffic"
 	AssignedRegionKey = "assigned-region"
 )

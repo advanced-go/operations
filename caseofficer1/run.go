@@ -52,6 +52,11 @@ func run(c *caseOfficer, log logFunc, update updateFunc, agent agentFunc) {
 	}
 }
 
+func logActivity(body []activity1.Entry) *core.Status {
+	_, status := activity1.Put(nil, body)
+	return status
+}
+
 func updateAssignments(traffic string, origin core.Origin) ([]assignment1.Entry, *core.Status) {
 	values := make(url.Values)
 	values.Add("traffic", traffic)
@@ -60,11 +65,6 @@ func updateAssignments(traffic string, origin core.Origin) ([]assignment1.Entry,
 	values.Add(core.SubZoneKey, origin.SubZone)
 	entries, _, status := assignment1.Get(nil, nil, values)
 	return entries, status
-}
-
-func logActivity(body []activity1.Entry) *core.Status {
-	_, status := activity1.Put(nil, body)
-	return status
 }
 
 func processAssignments(c *caseOfficer, log logFunc, update updateFunc, newAgent agentFunc) *core.Status {
@@ -77,7 +77,7 @@ func processAssignments(c *caseOfficer, log logFunc, update updateFunc, newAgent
 		return status
 	}
 	for _, e := range entries {
-		c.controllerAgents.Register(newAgent(c.traffic, e, c.handler))
+		c.controllers.Register(newAgent(c.traffic, e, c.handler))
 	}
 	return status
 }
