@@ -37,8 +37,8 @@ func run(c *caseOfficer, log logFunc, update updateFunc, agent agentFunc) {
 			}
 			switch msg.Event() {
 			case messaging.ShutdownEvent:
-				log(nil, c.uri, messaging.ShutdownEvent)
 				close(c.ctrlC)
+				log(nil, c.uri, messaging.ShutdownEvent)
 				return
 			default:
 			}

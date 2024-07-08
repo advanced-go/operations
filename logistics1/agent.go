@@ -3,11 +3,7 @@ package logistics1
 import (
 	"fmt"
 	"github.com/advanced-go/operations/activity1"
-	"github.com/advanced-go/operations/caseofficer1"
-	"github.com/advanced-go/operations/landscape1"
-	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
-	"net/url"
 	"time"
 )
 
@@ -62,11 +58,6 @@ func (l *logistics) Message(m *messaging.Message) {
 	messaging.Mux(m, l.ctrlC, nil, nil)
 }
 
-// Add - add a shutdown function
-//func (l *logistics) Add(f func()) {
-//	l.shutdown = messaging.AddShutdown(l.shutdown, f)
-//}
-
 // Shutdown - shutdown the agent
 func (l *logistics) Shutdown() {
 	if !l.running {
@@ -84,37 +75,11 @@ func (l *logistics) Shutdown() {
 }
 
 // Run - run the agent
-func (e *logistics) Run() {
-	if e.running {
+func (l *logistics) Run() {
+	if l.running {
 		return
 	}
-	e.running = true
+	l.running = true
 
-	go run(e, activity1.Log, getAssignments, newCaseOfficerAgent)
-}
-
-func getAssignments(region string) ([]landscape1.Entry, *core.Status) {
-	values := make(url.Values)
-	values.Add(landscape1.AssignedRegionKey, region)
-	values.Add(landscape1.StatusKey, landscape1.StatusActive)
-	return landscape1.Get(nil, nil, values)
-}
-
-func newCaseOfficerAgent(interval time.Duration, traffic string, origin core.Origin, handler messaging.Agent) messaging.Agent {
-	return caseofficer1.NewAgent(interval, traffic, origin, handler)
-}
-
-func processAssignments(l *logistics, log logFunc, get getFunc, newAgent agentFunc) *core.Status {
-	status := log(nil, l.uri, "logistics process Assignments")
-	if !status.OK() {
-		return status
-	}
-	entries, status1 := get(l.region)
-	if !status1.OK() {
-		return status1
-	}
-	for _, e1 := range entries {
-		l.caseOfficers.Register(newAgent(l.caseOfficerInterval, e1.Traffic, e1.Origin(), l))
-	}
-	return status
+	go run(l, activity1.Log, getAssignments, newCaseOfficerAgent)
 }

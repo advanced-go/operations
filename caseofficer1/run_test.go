@@ -1,20 +1,13 @@
 package caseofficer1
 
 import (
-	"context"
 	"fmt"
 	"github.com/advanced-go/operations/assignment1"
 	"github.com/advanced-go/stdlib/access"
 	"github.com/advanced-go/stdlib/core"
-	fmt2 "github.com/advanced-go/stdlib/fmt"
 	"github.com/advanced-go/stdlib/messaging"
 	"time"
 )
-
-func testLog(_ context.Context, agentId string, content any) *core.Status {
-	fmt.Printf("test: activity1.Log() -> %v : %v : %v\n", fmt2.FmtRFC3339Millis(time.Now().UTC()), agentId, content)
-	return core.StatusOK()
-}
 
 func ExampleNewControllerAgent() {
 	origin := core.Origin{
