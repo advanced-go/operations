@@ -7,6 +7,7 @@ import (
 	"github.com/advanced-go/stdlib/access"
 	"github.com/advanced-go/stdlib/core"
 	fmt2 "github.com/advanced-go/stdlib/fmt"
+	"github.com/advanced-go/stdlib/messaging"
 	"time"
 )
 
@@ -57,9 +58,55 @@ func ExampleProcessAssignments() {
 }
 
 func ExampleRun() {
-	fmt.Printf("test: run() -> [%v]\n", "")
+	origin := core.Origin{
+		Region:     "us-central1",
+		Zone:       "c",
+		SubZone:    "",
+		Host:       "www.host1.com",
+		InstanceId: "",
+	}
+	msg := messaging.NewControlMessage("to", "from", messaging.ShutdownEvent)
+
+	c := newAgent(time.Second*50, access.IngressTraffic, origin, newTestAgent())
+	go run(c, testLog, assignment1.Update, newControllerAgent)
+	time.Sleep(time.Second * 2)
+
+	c.ctrlC <- msg
+	time.Sleep(time.Second * 3)
+
+	fmt.Printf("test: run() -> [agents:%v]\n", c.controllers.List())
+
+	c.controllers.Broadcast(msg)
+	fmt.Printf("test: exchange.Broadcast() -> [agents:%v]\n", c.controllers.List())
 
 	//Output:
-	//fail
+	//test: activity1.Log() -> 2024-07-08T15:06:51.286Z : case-officer1:ingress.us-central1.c : process assignments : default
+	//test: activity1.Log() -> 2024-07-08T15:06:53.288Z : case-officer1:ingress.us-central1.c : event:shutdown
+	//test: run() -> [agents:[ingress-controller1:us-central1.c.www.host1.com ingress-controller1:us-central1.c.www.host2.com]]
+	//test: exchange.Broadcast() -> [agents:[]]
+
+}
+
+func ExampleRun_Error() {
+	origin := core.Origin{
+		Region:     "us-central1",
+		Zone:       "c",
+		SubZone:    "",
+		Host:       "www.host1.com",
+		InstanceId: "",
+	}
+	msg := messaging.NewControlMessage("to", "from", messaging.ShutdownEvent)
+
+	c := newAgent(time.Second*2, access.IngressTraffic, origin, newTestAgent())
+	go run(c, testLog, assignment1.Update, newControllerAgent)
+	time.Sleep(time.Second * 3)
+
+	c.ctrlC <- msg
+	time.Sleep(time.Second * 3)
+
+	//Output:
+	//test: activity1.Log() -> 2024-07-08T15:06:51.286Z : case-officer1:ingress.us-central1.c : process assignments : default
+	//test: activity1.Log() -> 2024-07-08T15:06:53.288Z : case-officer1:ingress.us-central1.c : event:shutdown
+	//test: run() -> [agents:[ingress-controller1:us-central1.c.www.host1.com ingress-controller1:us-central1.c.www.host2.com]]
 
 }

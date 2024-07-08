@@ -8,6 +8,7 @@ import (
 	"github.com/advanced-go/stdlib/access"
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
+	"sync"
 	"time"
 )
 
@@ -20,7 +21,7 @@ func run(c *caseOfficer, log logFunc, update updateFunc, agent agentFunc) {
 	if c == nil {
 		return
 	}
-	init := false
+	var once sync.Once
 	tick := time.Tick(c.interval)
 	for {
 		select {
@@ -42,15 +43,13 @@ func run(c *caseOfficer, log logFunc, update updateFunc, agent agentFunc) {
 			default:
 			}
 		default:
-			if !init {
-				init = true
+			once.Do(func() {
 				status := processAssignments(c, update, agent)
 				log(nil, c.uri, "process assignments : default")
 				if !status.OK() && !status.NotFound() {
 					c.handler.Message(messaging.NewStatusMessage(c.handler.Uri(), c.uri, status))
 				}
-				log(nil, c.uri, "process assignments : default")
-			}
+			})
 		}
 	}
 }
@@ -63,16 +62,15 @@ func newControllerAgent(traffic string, origin core.Origin, handler messaging.Ag
 }
 
 func processAssignments(c *caseOfficer, update updateFunc, newAgent agentFunc) *core.Status {
-	//status := log(nil, c.uri, "processingAssignment")
-	//if !status.OK() {
-	//	return status
-	//}
 	entries, status := update(nil, c.uri, c.origin)
 	if !status.OK() {
 		return status
 	}
 	for _, e := range entries {
-		c.controllers.Register(newAgent(c.traffic, e.Origin(), c.handler))
+		err := c.controllers.Register(newAgent(c.traffic, e.Origin(), c.handler))
+		if err != nil {
+			return core.NewStatusError(core.StatusInvalidArgument, err)
+		}
 	}
 	return status
 }

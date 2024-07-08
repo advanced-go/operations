@@ -48,12 +48,12 @@ func newTestAgent() *testAgent {
 func (t *testAgent) Uri() string { return "testAgent" }
 
 func (t *testAgent) Message(m *messaging.Message) {
-	if m.Channel() == messaging.ChannelStatus {
-		status := m.Status()
-		fmt.Printf("test: testAgent.Message() -> [status:%v] %v\n", status, m)
-	} else {
-		fmt.Printf("test: testAgent.Message() -> %v\n", m)
-	}
+	//if m.Channel() == messaging.ChannelStatus {
+	//	status := m.Status()
+	//	fmt.Printf("test: testAgent.Message() -> [status:%v] %v\n", status, m)
+	//} else {
+	fmt.Printf("test: testAgent.Message() -> %v\n", m)
+
 }
 
 func (t *testAgent) Run() {}
