@@ -3,9 +3,10 @@ package caseofficer1
 import (
 	"context"
 	"fmt"
+	"github.com/advanced-go/operations/assignment1"
+	"github.com/advanced-go/stdlib/access"
 	"github.com/advanced-go/stdlib/core"
 	fmt2 "github.com/advanced-go/stdlib/fmt"
-	"github.com/advanced-go/stdlib/messaging"
 	"time"
 )
 
@@ -14,29 +15,48 @@ func testLog(_ context.Context, agentId string, content any) *core.Status {
 	return core.StatusOK()
 }
 
-type testAgent struct{}
-
-func newTestAgent() *testAgent {
-	return new(testAgent)
-}
-
-func (t *testAgent) Uri() string { return "testAgent" }
-
-func (t *testAgent) Message(m *messaging.Message) {
-	if m.Channel() == messaging.ChannelStatus {
-		status := m.Status()
-		fmt.Printf("test: testAgent.Message() -> [status:%v] %v\n", status, m)
-	} else {
-		fmt.Printf("test: testAgent.Message() -> %v\n", m)
+func ExampleNewControllerAgent() {
+	origin := core.Origin{
+		Region:     "us-central1",
+		Zone:       "c",
+		SubZone:    "",
+		Host:       "www.host1.com",
+		InstanceId: "",
 	}
+	a := newControllerAgent(access.IngressTraffic, origin, nil)
+	fmt.Printf("test: newControllerAgent(\"%v\") -> [%v]\n", access.IngressTraffic, a)
+
+	a = newControllerAgent(access.EgressTraffic, origin, nil)
+	fmt.Printf("test: newControllerAgent(\"%v\") -> [%v]\n", access.EgressTraffic, a)
+
+	//Output:
+	//test: newControllerAgent("ingress") -> [ingress-controller1:us-central1.c.www.host1.com]
+	//test: newControllerAgent("egress") -> [egress-controller1:us-central1.c.www.host1.com]
+
 }
 
-func (t *testAgent) Run() {}
+func ExampleProcessAssignments() {
+	origin := core.Origin{
+		Region:     "us-central1",
+		Zone:       "c",
+		SubZone:    "",
+		Host:       "www.host1.com",
+		InstanceId: "",
+	}
 
-func (t *testAgent) Shutdown() {}
+	c := newAgent(time.Second*5, access.IngressTraffic, origin, nil)
+	fmt.Printf("test: newAgent() -> [status:%v]\n", c != nil)
+
+	status := processAssignments(c, assignment1.Update, newControllerAgent)
+	fmt.Printf("test: processAssignments() -> [status:%v] [controllers:%v]\n", status, c.controllers.Count())
+
+	//Output:
+	//test: newAgent() -> [status:true]
+	//test: processAssignments() -> [status:OK] [controllers:2]
+
+}
 
 func ExampleRun() {
-
 	fmt.Printf("test: run() -> [%v]\n", "")
 
 	//Output:

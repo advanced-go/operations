@@ -2,12 +2,24 @@ package caseofficer1
 
 import (
 	"errors"
+	"fmt"
 	"github.com/advanced-go/stdlib/access"
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
 	"net/http"
 	"time"
 )
+
+func ExampleInsertAssignmentStatus() {
+	msg := messaging.NewMessageWithStatus(messaging.ChannelStatus, "to", "from", "", core.StatusOK())
+	status := insertAssignmentStatus(msg)
+
+	fmt.Printf("test: insertAssignmentStatus() -> [status:%v]\n", status)
+
+	//Output:
+	//test: insertAssignmentStatus() -> [status:OK]
+
+}
 
 func ExampleRunStatus() {
 	origin := core.Origin{

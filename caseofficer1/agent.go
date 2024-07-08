@@ -1,15 +1,10 @@
 package caseofficer1
 
 import (
-	"errors"
 	"fmt"
-	"github.com/advanced-go/agency/egress1"
-	"github.com/advanced-go/agency/ingress1"
 	"github.com/advanced-go/operations/activity1"
 	"github.com/advanced-go/operations/assignment1"
-	"github.com/advanced-go/stdlib/access"
 	"github.com/advanced-go/stdlib/core"
-	fmt2 "github.com/advanced-go/stdlib/fmt"
 	"github.com/advanced-go/stdlib/messaging"
 	"time"
 )
@@ -107,43 +102,4 @@ func (c *caseOfficer) Run() {
 	c.running = true
 	go runStatus(c, activity1.Log, insertAssignmentStatus)
 	go run(c, activity1.Log, assignment1.Update, newControllerAgent)
-}
-
-func insertAssignmentStatus(msg *messaging.Message) *core.Status {
-	status := msg.Status()
-	if status == nil {
-		return core.NewStatusError(core.StatusInvalidArgument, errors.New("message body content is not of type *core.Status"))
-	}
-	return assignment1.InsertStatus(nil, msg.From(), core.Origin{
-		Region:  msg.Header.Get(core.RegionKey),
-		Zone:    msg.Header.Get(core.ZoneKey),
-		SubZone: msg.Header.Get(core.SubZoneKey),
-		Host:    msg.Header.Get(core.HostKey),
-	}, status)
-}
-
-func newControllerAgent(traffic string, origin core.Origin, handler messaging.Agent) messaging.Agent {
-	if traffic == access.IngressTraffic {
-		return ingress1.NewControllerAgent(origin, handler)
-	}
-	return egress1.NewControllerAgent(origin, handler)
-}
-
-func processAssignments(c *caseOfficer, log logFunc, update updateFunc, newAgent agentFunc) *core.Status {
-	status := log(nil, c.uri, formatContent("processingAssignment"))
-	if !status.OK() {
-		return status
-	}
-	entries, status1 := update(nil, c.uri, c.origin)
-	if !status1.OK() {
-		return status
-	}
-	for _, e := range entries {
-		c.controllers.Register(newAgent(c.traffic, e.Origin(), c.handler))
-	}
-	return status
-}
-
-func formatContent(content any) string {
-	return fmt.Sprintf("%v : %v", fmt2.FmtRFC3339Millis(time.Now().UTC()), content)
 }

@@ -3,11 +3,8 @@ package caseofficer1
 import (
 	"fmt"
 	"github.com/advanced-go/operations/activity1"
-	"github.com/advanced-go/operations/assignment1"
-	"github.com/advanced-go/stdlib/access"
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
-	"time"
 )
 
 func ExampleAgentUri() {
@@ -42,73 +39,23 @@ func ExampleLogActivity() {
 
 }
 
-func ExampleInsertAssignmentStatus() {
-	msg := messaging.NewMessageWithStatus(messaging.ChannelStatus, "to", "from", "", core.StatusOK())
-	status := insertAssignmentStatus(msg)
+type testAgent struct{}
 
-	fmt.Printf("test: insertAssignmentStatus() -> [status:%v]\n", status)
-
-	//Output:
-	//test: insertAssignmentStatus() -> [status:OK]
-
+func newTestAgent() *testAgent {
+	return new(testAgent)
 }
 
-func ExampleNewControllerAgent() {
-	origin := core.Origin{
-		Region:     "us-central1",
-		Zone:       "c",
-		SubZone:    "",
-		Host:       "www.host1.com",
-		InstanceId: "",
+func (t *testAgent) Uri() string { return "testAgent" }
+
+func (t *testAgent) Message(m *messaging.Message) {
+	if m.Channel() == messaging.ChannelStatus {
+		status := m.Status()
+		fmt.Printf("test: testAgent.Message() -> [status:%v] %v\n", status, m)
+	} else {
+		fmt.Printf("test: testAgent.Message() -> %v\n", m)
 	}
-	a := newControllerAgent(access.IngressTraffic, origin, nil)
-	fmt.Printf("test: newControllerAgent(\"%v\") -> [%v]\n", access.IngressTraffic, a)
-
-	a = newControllerAgent(access.EgressTraffic, origin, nil)
-	fmt.Printf("test: newControllerAgent(\"%v\") -> [%v]\n", access.EgressTraffic, a)
-
-	//Output:
-	//test: newControllerAgent("ingress") -> [ingress-controller1:us-central1.c.www.host1.com]
-	//test: newControllerAgent("egress") -> [egress-controller1:us-central1.c.www.host1.com]
-
 }
 
-func ExampleProcessAssignments() {
-	origin := core.Origin{
-		Region:     "us-central1",
-		Zone:       "c",
-		SubZone:    "",
-		Host:       "www.host1.com",
-		InstanceId: "",
-	}
+func (t *testAgent) Run() {}
 
-	c := newAgent(time.Second*5, access.IngressTraffic, origin, nil)
-	fmt.Printf("test: newAgent() -> [status:%v]\n", c != nil)
-
-	status := processAssignments(c, activity1.Log, assignment1.Update, newControllerAgent)
-	fmt.Printf("test: processAssignments() -> [status:%v] [controllers:%v]\n", status, c.controllers.Count())
-
-	//Output:
-	//test: newAgent() -> [status:true]
-	//test: processAssignments() -> [status:OK] [controllers:2]
-
-}
-
-func ExampleFormatContent() {
-	s := formatContent(nil)
-	fmt.Printf("test: formatContent() -> %v\n", s)
-
-	s = formatContent(core.Origin{
-		Region:     "region",
-		Zone:       "zone",
-		SubZone:    "sub-zone",
-		Host:       "host",
-		InstanceId: "",
-	})
-	fmt.Printf("test: formatContent() -> %v\n", s)
-
-	//Output:
-	//test: formatContent() -> 2024-07-08T12:48:19.673Z : <nil>
-	//test: formatContent() -> 2024-07-08T12:48:19.673Z : {region zone sub-zone host }
-	
-}
+func (t *testAgent) Shutdown() {}
