@@ -10,7 +10,7 @@ import (
 )
 
 func testLog(_ context.Context, agentId string, content any) *core.Status {
-	fmt.Printf("test: %v : %v : %v\n", fmt2.FmtRFC3339Millis(time.Now().UTC()), agentId, content)
+	fmt.Printf("test: activity1.Log() -> %v : %v : %v\n", fmt2.FmtRFC3339Millis(time.Now().UTC()), agentId, content)
 	return core.StatusOK()
 }
 
@@ -23,7 +23,12 @@ func newTestAgent() *testAgent {
 func (t *testAgent) Uri() string { return "" }
 
 func (t *testAgent) Message(m *messaging.Message) {
-	fmt.Printf("%v", m)
+	if m.Channel() == messaging.ChannelStatus {
+		status := m.Status()
+		fmt.Printf("test: testAgent.Message() -> [status:%v] %v\n", status, m)
+	} else {
+		fmt.Printf("test: testAgent.Message() -> %v\n", m)
+	}
 }
 
 func (t *testAgent) Run() {}
