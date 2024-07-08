@@ -3,10 +3,12 @@ package activity1
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/advanced-go/stdlib/core"
 	json2 "github.com/advanced-go/stdlib/json"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 const (
@@ -34,4 +36,17 @@ func Put(r *http.Request, body []Entry) (h2 http.Header, status *core.Status) {
 		body = content
 	}
 	return put[core.Log](r.Context(), core.AddRequestId(r.Header), activityResource, "", body, nil)
+}
+
+func Log(ctx context.Context, agentId string, content any) *core.Status {
+	e := Entry{
+		EntryId:   0,
+		AgentId:   agentId,
+		CreatedTS: time.Now().UTC(),
+		Content:   "",
+	}
+	if content != nil {
+		e.Content = fmt.Sprintf("%v", content)
+	}
+	return insertEntry([]Entry{e})
 }

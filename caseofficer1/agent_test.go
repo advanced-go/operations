@@ -33,12 +33,12 @@ func ExampleNewAgent() {
 }
 
 func ExampleLogActivity() {
-	status := logActivity([]activity1.Entry{{AgentId: "agent-id"}})
+	status := activity1.Log(nil, "agent-id", "example log ")
 
-	fmt.Printf("test: logActivity() -> [status:%v]\n", status)
+	fmt.Printf("test: activity1.Log() -> [status:%v]\n", status)
 
 	//Output:
-	//test: logActivity() -> [status:OK]
+	//test: activity1.Log() -> [status:OK]
 
 }
 
@@ -85,7 +85,7 @@ func ExampleProcessAssignments() {
 	c := newAgent(time.Second*5, access.IngressTraffic, origin, nil)
 	fmt.Printf("test: newAgent() -> [status:%v]\n", c != nil)
 
-	status := processAssignments(c, logActivity, assignment1.Update, newControllerAgent)
+	status := processAssignments(c, activity1.Log, assignment1.Update, newControllerAgent)
 	fmt.Printf("test: processAssignments() -> [status:%v] [controllers:%v]\n", status, c.controllers.Count())
 
 	//Output:

@@ -1,7 +1,6 @@
 package caseofficer1
 
 import (
-	"github.com/advanced-go/operations/activity1"
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
 )
@@ -19,7 +18,7 @@ func runStatus(c *caseOfficer, log logFunc, insert insertFunc) {
 			if !open1 {
 				return
 			}
-			status1 := log([]activity1.Entry{{AgentId: c.uri}})
+			status1 := log(nil, c.uri, "processing controller status message")
 			if !status1.OK() {
 				c.handler.Message(messaging.NewStatusMessage("", "", "", status1))
 			} else {

@@ -90,12 +90,7 @@ func (e *logistics) Run() {
 	}
 	e.running = true
 
-	go run(e, logActivity, getAssignments, newCaseOfficerAgent)
-}
-
-func logActivity(body []activity1.Entry) *core.Status {
-	_, status := activity1.Put(nil, body)
-	return status
+	go run(e, activity1.Log, getAssignments, newCaseOfficerAgent)
 }
 
 func getAssignments(region string) ([]landscape1.Entry, *core.Status) {
@@ -110,7 +105,7 @@ func newCaseOfficerAgent(interval time.Duration, traffic string, origin core.Ori
 }
 
 func processAssignments(l *logistics, log logFunc, get getFunc, newAgent agentFunc) *core.Status {
-	status := log([]activity1.Entry{{AgentId: l.uri}})
+	status := log(nil, l.uri, "logistics process Assignments")
 	if !status.OK() {
 		return status
 	}

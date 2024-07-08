@@ -12,13 +12,13 @@ const (
 	EntryIdName   = "entry_id"
 	AgentIdName   = "agent_id"
 	CreatedTSName = "created_ts"
-	DetailsName   = "details"
+	ContentName   = "content"
 )
 
 var (
 	safeEntry = common.NewSafe()
 	entryData = []Entry{
-		{EntryId: 1, AgentId: "agency-id", Details: "testing 1-2-3", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{EntryId: 1, AgentId: "agency-id", Content: "testing 1-2-3", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
 	}
 )
 
@@ -28,7 +28,7 @@ type Entry struct {
 	AgentId   string    `json:"agency-id"`
 	CreatedTS time.Time `json:"created-ts"`
 
-	Details string `json:"details"`
+	Content string `json:"content"`
 }
 
 func (Entry) Scan(columnNames []string, values []any) (e Entry, err error) {
@@ -41,8 +41,8 @@ func (Entry) Scan(columnNames []string, values []any) (e Entry, err error) {
 		case CreatedTSName:
 			e.CreatedTS = values[i].(time.Time)
 
-		case DetailsName:
-			e.Details = values[i].(string)
+		case ContentName:
+			e.Content = values[i].(string)
 		default:
 			err = errors.New(fmt.Sprintf("invalid field name: %v", name))
 			return
@@ -56,7 +56,7 @@ func (e Entry) Values() []any {
 		e.EntryId,
 		e.AgentId,
 		e.CreatedTS,
-		e.Details,
+		e.Content,
 	}
 }
 

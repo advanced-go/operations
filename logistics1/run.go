@@ -1,14 +1,14 @@
 package logistics1
 
 import (
-	"github.com/advanced-go/operations/activity1"
+	"context"
 	"github.com/advanced-go/operations/landscape1"
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
 	"time"
 )
 
-type logFunc func(body []activity1.Entry) *core.Status
+type logFunc func(ctx context.Context, agentId string, content any) *core.Status
 type agentFunc func(interval time.Duration, traffic string, origin core.Origin, handler messaging.Agent) messaging.Agent
 type getFunc func(region string) ([]landscape1.Entry, *core.Status)
 
@@ -39,7 +39,7 @@ func run(l *logistics, log logFunc, get getFunc, agent agentFunc) {
 				init = true
 				status := processAssignments(l, log, get, agent)
 				if !status.OK() && !status.NotFound() {
-					log([]activity1.Entry{{AgentId: l.uri, Details: status.Err.Error()}})
+					log(nil, l.uri, status.Err)
 					// TODO : how to handle log error
 				}
 			}

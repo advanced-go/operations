@@ -10,7 +10,6 @@ import (
 	"github.com/advanced-go/stdlib/access"
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
-	"net/http"
 	"time"
 )
 
@@ -105,14 +104,8 @@ func (c *caseOfficer) Run() {
 		return
 	}
 	c.running = true
-	go runStatus(c, logActivity, insertAssignmentStatus)
-	go run(c, logActivity, assignment1.Update, newControllerAgent)
-}
-
-func logActivity(body []activity1.Entry) *core.Status {
-	req, _ := http.NewRequest("", "https://www.google.com/search?q=golang", nil)
-	_, status := activity1.Put(req, body)
-	return status
+	go runStatus(c, activity1.Log, insertAssignmentStatus)
+	go run(c, activity1.Log, assignment1.Update, newControllerAgent)
 }
 
 func insertAssignmentStatus(msg *messaging.Message) *core.Status {
@@ -136,7 +129,7 @@ func newControllerAgent(traffic string, origin core.Origin, handler messaging.Ag
 }
 
 func processAssignments(c *caseOfficer, log logFunc, update updateFunc, newAgent agentFunc) *core.Status {
-	status := log([]activity1.Entry{{AgentId: c.uri}})
+	status := log(nil, c.uri, "processingAssignment")
 	if !status.OK() {
 		return status
 	}
