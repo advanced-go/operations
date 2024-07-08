@@ -1,6 +1,7 @@
 package caseofficer1
 
 import (
+	"context"
 	"github.com/advanced-go/operations/activity1"
 	"github.com/advanced-go/operations/assignment1"
 	"github.com/advanced-go/stdlib/core"
@@ -9,7 +10,7 @@ import (
 )
 
 type logFunc func(body []activity1.Entry) *core.Status
-type updateFunc func(origin core.Origin) ([]assignment1.Entry, *core.Status)
+type updateFunc func(ctx context.Context, agentId string, origin core.Origin) ([]assignment1.Entry, *core.Status)
 type agentFunc func(traffic string, origin core.Origin, handler messaging.Agent) messaging.Agent
 
 // run - case officer

@@ -11,7 +11,6 @@ import (
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
 	"net/http"
-	"net/url"
 	"time"
 )
 
@@ -77,9 +76,9 @@ func (c *caseOfficer) Message(m *messaging.Message) {
 }
 
 // Add - add a shutdown function
-func (c *caseOfficer) Add(f func()) {
-	c.shutdown = messaging.AddShutdown(c.shutdown, f)
-}
+//func (c *caseOfficer) Add(f func()) {
+//	c.shutdown = messaging.AddShutdown(c.shutdown, f)
+//}
 
 // Shutdown - shutdown the agent
 func (c *caseOfficer) Shutdown() {
@@ -107,7 +106,7 @@ func (c *caseOfficer) Run() {
 	}
 	c.running = true
 	go runStatus(c, logActivity, insertAssignmentStatus)
-	go run(c, logActivity, updateAssignments, newAgent)
+	go run(c, logActivity, assignment1.Update, newAgent)
 }
 
 func logActivity(body []activity1.Entry) *core.Status {
@@ -121,22 +120,12 @@ func insertAssignmentStatus(msg *messaging.Message) *core.Status {
 	if status == nil {
 		return core.NewStatusError(core.StatusInvalidArgument, errors.New("message body content is not of type *core.Status"))
 	}
-	values := make(url.Values)
-	values.Add(core.RegionKey, msg.Header.Get(core.RegionKey))
-	values.Add(core.ZoneKey, msg.Header.Get(core.ZoneKey))
-	values.Add(core.SubZoneKey, msg.Header.Get(core.SubZoneKey))
-	values.Add(core.HostKey, msg.Header.Get(core.HostKey))
-	return assignment1.InsertStatus(nil, values, status)
-}
-
-func updateAssignments(origin core.Origin) ([]assignment1.Entry, *core.Status) {
-	values := make(url.Values)
-	values.Add(core.RegionKey, origin.Region)
-	values.Add(core.ZoneKey, origin.Zone)
-	values.Add(core.SubZoneKey, origin.SubZone)
-	//values.Add(core.HostKey, origin.Host)
-	entries, _, status := assignment1.Get(nil, nil, values)
-	return entries, status
+	return assignment1.InsertStatus(nil, msg.Header.Get("agent-id"), core.Origin{
+		Region:  msg.Header.Get(core.RegionKey),
+		Zone:    msg.Header.Get(core.ZoneKey),
+		SubZone: msg.Header.Get(core.SubZoneKey),
+		Host:    msg.Header.Get(core.HostKey),
+	}, status)
 }
 
 func newAgent(traffic string, origin core.Origin, handler messaging.Agent) messaging.Agent {
@@ -151,7 +140,7 @@ func processAssignments(c *caseOfficer, log logFunc, update updateFunc, newAgent
 	if !status.OK() {
 		return status
 	}
-	entries, status1 := update(c.origin)
+	entries, status1 := update(nil, c.uri, c.origin)
 	if !status1.OK() {
 		return status
 	}

@@ -25,8 +25,8 @@ func ExampleGet_Entry() {
 
 	//Output:
 	//test: Get("region=*") -> [status:OK] [entries:5]
-	//test: Get("region=*&order=desc") -> [status:OK] [entries:[{us-central1 d  www.host4.com 2024-06-10 09:00:35 +0000 UTC} {us-central1 c  www.host2.com 2024-06-10 09:00:35 +0000 UTC} {us-central1 c  www.host1.com 2024-06-10 09:00:35 +0000 UTC} {us-west1 a  www.host2.com 2024-06-10 09:00:35 +0000 UTC} {us-west1 a  www.host1.com 2024-06-10 09:00:35 +0000 UTC}]]
-	//test: Get("region=us-central1") -> [status:OK] [entries:[{us-central1 c  www.host1.com 2024-06-10 09:00:35 +0000 UTC} {us-central1 c  www.host2.com 2024-06-10 09:00:35 +0000 UTC} {us-central1 d  www.host4.com 2024-06-10 09:00:35 +0000 UTC}]]
-	//test: Get("region=us-central1&zone=d") -> [status:OK] [entries:[{us-central1 d  www.host4.com 2024-06-10 09:00:35 +0000 UTC}]]
-	
+	//test: Get("region=*&order=desc") -> [status:OK] [entries:[{us-central1 d  www.host4.com test-agent 2024-06-10 09:00:35 +0000 UTC} {us-central1 c  www.host2.com test-agent 2024-06-10 09:00:35 +0000 UTC} {us-central1 c  www.host1.com test-agent 2024-06-10 09:00:35 +0000 UTC} {us-west1 a  www.host2.com test-agent 2024-06-10 09:00:35 +0000 UTC} {us-west1 a  www.host1.com test-agent 2024-06-10 09:00:35 +0000 UTC}]]
+	//test: Get("region=us-central1") -> [status:OK] [entries:[{us-central1 c  www.host1.com test-agent 2024-06-10 09:00:35 +0000 UTC} {us-central1 c  www.host2.com test-agent 2024-06-10 09:00:35 +0000 UTC} {us-central1 d  www.host4.com test-agent 2024-06-10 09:00:35 +0000 UTC}]]
+	//test: Get("region=us-central1&zone=d") -> [status:OK] [entries:[{us-central1 d  www.host4.com test-agent 2024-06-10 09:00:35 +0000 UTC}]]
+
 }

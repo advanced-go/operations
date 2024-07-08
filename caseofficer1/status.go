@@ -8,7 +8,7 @@ import (
 
 type insertFunc func(msg *messaging.Message) *core.Status
 
-// run - status processing
+// run - case officer status processing
 func runStatus(c *caseOfficer, log logFunc, insert insertFunc) {
 	if c == nil {
 		return

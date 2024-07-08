@@ -3,6 +3,7 @@ package assignment1
 import (
 	"errors"
 	"fmt"
+	"github.com/advanced-go/operations/common"
 	"time"
 )
 
@@ -17,13 +18,15 @@ const (
 		"request_id,url,protocol,method,host,path,status_code,bytes_sent,status_flags," +
 		"timeout,rate_limit,rate_burst,retry,retry_rate_limit,retry_rate_burst,failover) VALUES"
 
-	StatusName = "status"
+	Code    = "code"
+	Content = "content"
 )
 
 var (
+	safeStatus = common.NewSafe()
 	statusData = []EntryStatus{
-		{Region: "us-west-2", Zone: "usw2-az4", Host: "www.host2.com", Status: "error", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
-		{Region: "us-west-2", Zone: "usw2-az3", Host: "www.host1.com", Status: "other", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Region: "us-west-2", Zone: "usw2-az4", Host: "www.host2.com", Code: 0, Content: "error", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Region: "us-west-2", Zone: "usw2-az3", Host: "www.host1.com", Code: 0, Content: "other", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
 	}
 )
 
@@ -37,10 +40,12 @@ type EntryStatus struct {
 	Zone      string    `json:"zone"`
 	SubZone   string    `json:"sub-zone"`
 	Host      string    `json:"host"`
+	AgentId   string    `json:"agent-id"`
 	CreatedTS time.Time `json:"created-ts"`
 
 	// Status information for non-standard assignment processing, such as error. Case Officer should monitor this
-	Status string `json:"status"`
+	Code    int    `json:"code"`
+	Content string `json:"content"`
 }
 
 func (EntryStatus) Scan(columnNames []string, values []any) (e EntryStatus, err error) {
@@ -56,8 +61,10 @@ func (EntryStatus) Scan(columnNames []string, values []any) (e EntryStatus, err 
 			e.Host = values[i].(string)
 		case CreatedTSName:
 			e.CreatedTS = values[i].(time.Time)
-		case StatusName:
-			e.Status = values[i].(string)
+		case Code:
+			e.Code = values[i].(int)
+		case Content:
+			e.Content = values[i].(string)
 		default:
 			err = errors.New(fmt.Sprintf("invalid field name: %v", name))
 			return
@@ -73,7 +80,8 @@ func (e EntryStatus) Values() []any {
 		e.SubZone,
 		e.Host,
 		e.CreatedTS,
-		e.Status,
+		e.Code,
+		e.Content,
 	}
 }
 
