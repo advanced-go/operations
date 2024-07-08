@@ -30,8 +30,37 @@ func ExampleRunStatus() {
 	c.statusCtrlC <- msg
 	time.Sleep(time.Second * 3)
 
-	//fmt.Printf("test: InsertStatus() -> [entry:%v]")
+	//Output:
+	//test: activity1.Log() -> 2024-07-08T14:30:07.973Z : case-officer1:ingress.us-central1.c : processing status message
+	//test: activity1.Log() -> 2024-07-08T14:30:08.975Z : case-officer1:ingress.us-central1.c : shutting down
+
+}
+
+func ExampleRunStatus_Error() {
+	origin := core.Origin{
+		Region:     "us-central1",
+		Zone:       "c",
+		SubZone:    "",
+		Host:       "www.host1.com",
+		InstanceId: "",
+	}
+	msg := messaging.NewControlMessage("to", "from", messaging.ShutdownEvent)
+
+	c := newAgent(time.Second*1, access.IngressTraffic, origin, newTestAgent())
+	go runStatus(c, testLog, func(m *messaging.Message) *core.Status {
+		return core.NewStatusError(http.StatusGatewayTimeout, errors.New("context deadline exceeded"))
+	})
+
+	status := core.NewStatusError(http.StatusTeapot, errors.New("teapot error"))
+	c.statusC <- messaging.NewMessageWithStatus(messaging.ChannelStatus, "to", "from", "event:status", status)
+	time.Sleep(time.Second * 1)
+
+	c.statusCtrlC <- msg
+	time.Sleep(time.Second * 3)
 
 	//Output:
-	//fail
+	//test: activity1.Log() -> 2024-07-08T14:35:38.921Z : case-officer1:ingress.us-central1.c : processing status message
+	//test: testAgent.Message() -> [status:Timeout [context deadline exceeded]] [chan:STATUS] [from:case-officer1:ingress.us-central1.c] [to:testAgent] [event:status]
+	//test: activity1.Log() -> 2024-07-08T14:35:39.925Z : case-officer1:ingress.us-central1.c : shutting down
+
 }

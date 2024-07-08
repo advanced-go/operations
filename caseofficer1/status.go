@@ -23,7 +23,6 @@ func runStatus(c *caseOfficer, log logFunc, insert insertFunc) {
 				c.handler.Message(messaging.NewStatusMessage(c.handler.Uri(), c.uri, status1))
 			} else {
 				status1 = insert(msg)
-				c.handler.Message(messaging.NewStatusMessage(c.handler.Uri(), c.uri, status1))
 				if !status1.OK() && !status1.NotFound() {
 					c.handler.Message(messaging.NewStatusMessage(c.handler.Uri(), c.uri, status1))
 				}
