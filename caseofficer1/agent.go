@@ -113,7 +113,7 @@ func insertAssignmentStatus(msg *messaging.Message) *core.Status {
 	if status == nil {
 		return core.NewStatusError(core.StatusInvalidArgument, errors.New("message body content is not of type *core.Status"))
 	}
-	return assignment1.InsertStatus(nil, msg.Header.Get("agent-id"), core.Origin{
+	return assignment1.InsertStatus(nil, msg.From(), core.Origin{
 		Region:  msg.Header.Get(core.RegionKey),
 		Zone:    msg.Header.Get(core.ZoneKey),
 		SubZone: msg.Header.Get(core.SubZoneKey),

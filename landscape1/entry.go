@@ -49,7 +49,7 @@ type Entry struct {
 	SubZone   string    `json:"sub-zone"`
 	Traffic   string    `json:"traffic"`
 	Status    string    `json:"status"` // active or inactive
-	AgentId   string    `json:"agency-id"`
+	AgentId   string    `json:"agent-id"`
 	CreatedTS time.Time `json:"created-ts"`
 
 	AssigneeClass  string `json:"assignee-class"`
