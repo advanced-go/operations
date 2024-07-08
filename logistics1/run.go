@@ -13,10 +13,10 @@ import (
 
 type logFunc func(ctx context.Context, agentId string, content any) *core.Status
 type agentFunc func(interval time.Duration, traffic string, origin core.Origin, handler messaging.Agent) messaging.Agent
-type getFunc func(region string) ([]landscape1.Entry, *core.Status)
+type queryFunc func(region string) ([]landscape1.Entry, *core.Status)
 
 // run - operations logistics
-func run(l *logistics, log logFunc, get getFunc, agent agentFunc) {
+func run(l *logistics, log logFunc, query queryFunc, agent agentFunc) {
 	if l == nil {
 		return
 	}
@@ -41,7 +41,7 @@ func run(l *logistics, log logFunc, get getFunc, agent agentFunc) {
 			}
 		default:
 			once.Do(func() {
-				status := processAssignments(l, log, get, agent)
+				status := processAssignments(l, query, agent)
 				log(nil, l.uri, "process assignments : default")
 				if !status.OK() && !status.NotFound() {
 					log(nil, l.uri, status.Err)
@@ -56,15 +56,15 @@ func newCaseOfficerAgent(interval time.Duration, traffic string, origin core.Ori
 	return caseofficer1.NewAgent(interval, traffic, origin, handler)
 }
 
-func getAssignments(region string) ([]landscape1.Entry, *core.Status) {
+func queryAssignments(region string) ([]landscape1.Entry, *core.Status) {
 	values := make(url.Values)
 	values.Add(landscape1.AssignedRegionKey, region)
 	values.Add(landscape1.StatusKey, landscape1.StatusActive)
 	return landscape1.Get(nil, nil, values)
 }
 
-func processAssignments(l *logistics, log logFunc, get getFunc, newAgent agentFunc) *core.Status {
-	entries, status := get(l.region)
+func processAssignments(l *logistics, query queryFunc, newAgent agentFunc) *core.Status {
+	entries, status := query(l.region)
 	if !status.OK() {
 		return status
 	}

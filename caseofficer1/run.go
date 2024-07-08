@@ -61,13 +61,13 @@ func newControllerAgent(traffic string, origin core.Origin, handler messaging.Ag
 	return egress1.NewControllerAgent(origin, handler)
 }
 
-func processAssignments(c *caseOfficer, update updateFunc, newAgent agentFunc) *core.Status {
+func processAssignments(c *caseOfficer, update updateFunc, agent agentFunc) *core.Status {
 	entries, status := update(nil, c.uri, c.origin)
 	if !status.OK() {
 		return status
 	}
 	for _, e := range entries {
-		err := c.controllers.Register(newAgent(c.traffic, e.Origin(), c.handler))
+		err := c.controllers.Register(agent(c.traffic, e.Origin(), c.handler))
 		if err != nil {
 			return core.NewStatusError(core.StatusInvalidArgument, err)
 		}

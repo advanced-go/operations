@@ -81,5 +81,5 @@ func (l *logistics) Run() {
 	}
 	l.running = true
 
-	go run(l, activity1.Log, getAssignments, newCaseOfficerAgent)
+	go run(l, activity1.Log, queryAssignments, newCaseOfficerAgent)
 }
