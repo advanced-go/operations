@@ -2,7 +2,6 @@ package caseofficer1
 
 import (
 	"errors"
-	"fmt"
 	"github.com/advanced-go/stdlib/access"
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
@@ -19,7 +18,7 @@ func ExampleRunStatus() {
 		InstanceId: "",
 	}
 	msg := messaging.NewControlMessage("to", "from", messaging.ShutdownEvent)
-	fmt.Printf("test: NewMessage() -> %v\n", msg.Event())
+	//fmt.Printf("test: NewMessage() -> %v\n", msg.Event())
 
 	c := newAgent(time.Second*1, access.IngressTraffic, origin, newTestAgent())
 	go runStatus(c, testLog, insertAssignmentStatus)

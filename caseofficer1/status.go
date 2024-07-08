@@ -20,12 +20,12 @@ func runStatus(c *caseOfficer, log logFunc, insert insertFunc) {
 			}
 			status1 := log(nil, c.uri, "processing status message")
 			if !status1.OK() {
-				c.handler.Message(messaging.NewStatusMessage("", c.uri, "", status1))
+				c.handler.Message(messaging.NewStatusMessage(c.handler.Uri(), c.uri, status1))
 			} else {
 				status1 = insert(msg)
-				c.handler.Message(messaging.NewStatusMessage("", c.uri, "", status1))
+				c.handler.Message(messaging.NewStatusMessage(c.handler.Uri(), c.uri, status1))
 				if !status1.OK() && !status1.NotFound() {
-					c.handler.Message(messaging.NewStatusMessage("", c.uri, "", status1))
+					c.handler.Message(messaging.NewStatusMessage(c.handler.Uri(), c.uri, status1))
 				}
 			}
 		case msg1, open1 := <-c.statusCtrlC:

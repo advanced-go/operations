@@ -3,9 +3,9 @@ module github.com/advanced-go/operations
 go 1.21.4
 
 require (
-	github.com/advanced-go/agency v0.0.0-20240706115051-1a056dfe35cf
+	github.com/advanced-go/agency v0.0.0-20240708141331-cd066e0b141d
 	github.com/advanced-go/postgresql v0.0.0-20240616075129-fc362725c643
-	github.com/advanced-go/stdlib v0.0.0-20240708092713-062a2998bdc9
+	github.com/advanced-go/stdlib v0.0.0-20240708140828-cc8696367ec4
 )
 
 require (

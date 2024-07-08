@@ -24,7 +24,7 @@ func run(c *caseOfficer, log logFunc, update updateFunc, agent agentFunc) {
 		case <-tick:
 			status := processAssignments(c, log, update, agent)
 			if !status.OK() && !status.NotFound() {
-				c.handler.Message(messaging.NewStatusMessage("", "", "", status))
+				c.handler.Message(messaging.NewStatusMessage(c.handler.Uri(), c.uri, status))
 			}
 		case msg, open := <-c.ctrlC:
 			if !open {
@@ -41,7 +41,7 @@ func run(c *caseOfficer, log logFunc, update updateFunc, agent agentFunc) {
 				init = true
 				status := processAssignments(c, log, update, agent)
 				if !status.OK() && !status.NotFound() {
-					c.handler.Message(messaging.NewStatusMessage("", "", "", status))
+					c.handler.Message(messaging.NewStatusMessage(c.handler.Uri(), c.uri, status))
 				}
 			}
 		}

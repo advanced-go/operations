@@ -20,7 +20,7 @@ func newTestAgent() *testAgent {
 	return new(testAgent)
 }
 
-func (t *testAgent) Uri() string { return "" }
+func (t *testAgent) Uri() string { return "testAgent" }
 
 func (t *testAgent) Message(m *messaging.Message) {
 	if m.Channel() == messaging.ChannelStatus {
