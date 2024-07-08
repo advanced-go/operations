@@ -93,3 +93,22 @@ func ExampleProcessAssignments() {
 	//test: processAssignments() -> [status:OK] [controllers:2]
 
 }
+
+func ExampleFormatContent() {
+	s := formatContent(nil)
+	fmt.Printf("test: formatContent() -> %v\n", s)
+
+	s = formatContent(core.Origin{
+		Region:     "region",
+		Zone:       "zone",
+		SubZone:    "sub-zone",
+		Host:       "host",
+		InstanceId: "",
+	})
+	fmt.Printf("test: formatContent() -> %v\n", s)
+
+	//Output:
+	//test: formatContent() -> 2024-07-08T12:48:19.673Z : <nil>
+	//test: formatContent() -> 2024-07-08T12:48:19.673Z : {region zone sub-zone host }
+	
+}

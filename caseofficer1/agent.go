@@ -9,6 +9,7 @@ import (
 	"github.com/advanced-go/operations/assignment1"
 	"github.com/advanced-go/stdlib/access"
 	"github.com/advanced-go/stdlib/core"
+	fmt2 "github.com/advanced-go/stdlib/fmt"
 	"github.com/advanced-go/stdlib/messaging"
 	"time"
 )
@@ -129,7 +130,7 @@ func newControllerAgent(traffic string, origin core.Origin, handler messaging.Ag
 }
 
 func processAssignments(c *caseOfficer, log logFunc, update updateFunc, newAgent agentFunc) *core.Status {
-	status := log(nil, c.uri, "processingAssignment")
+	status := log(nil, c.uri, formatContent("processingAssignment"))
 	if !status.OK() {
 		return status
 	}
@@ -141,4 +142,8 @@ func processAssignments(c *caseOfficer, log logFunc, update updateFunc, newAgent
 		c.controllers.Register(newAgent(c.traffic, e.Origin(), c.handler))
 	}
 	return status
+}
+
+func formatContent(content any) string {
+	return fmt.Sprintf("%v : %v", fmt2.FmtRFC3339Millis(time.Now().UTC()), content)
 }

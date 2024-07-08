@@ -14,8 +14,8 @@ func runStatus(c *caseOfficer, log logFunc, insert insertFunc) {
 	}
 	for {
 		select {
-		case msg, open1 := <-c.statusC:
-			if !open1 {
+		case msg, open := <-c.statusC:
+			if !open {
 				return
 			}
 			status1 := log(nil, c.uri, "processing controller status message")
@@ -27,12 +27,13 @@ func runStatus(c *caseOfficer, log logFunc, insert insertFunc) {
 					c.handler.Message(messaging.NewStatusMessage("", "", "", status1))
 				}
 			}
-		case msg, open := <-c.ctrlC:
-			if !open {
+		case msg1, open1 := <-c.statusCtrlC:
+			if !open1 {
 				return
 			}
-			switch msg.Event() {
+			switch msg1.Event() {
 			case messaging.ShutdownEvent:
+				log(nil, c.uri, "shutting down")
 				close(c.statusC)
 				close(c.statusCtrlC)
 				return
