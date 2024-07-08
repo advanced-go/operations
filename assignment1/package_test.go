@@ -34,3 +34,18 @@ func ExampleInsertStatus() {
 	//test: InsertStatus() -> [status:OK] [content:{us-central1 c  www.host1.com }]
 
 }
+
+func ExampleUpdate() {
+	entries, status := Update(nil, "agent-id", core.Origin{
+		Region:     "us-central1",
+		Zone:       "c",
+		SubZone:    "",
+		Host:       "",
+		InstanceId: "",
+	})
+	fmt.Printf("test: Update() -> [status:%v] [entries:%v]\n", status, entries)
+
+	//Output:
+	//test: Update() -> [status:OK] [entries:[{us-central1 c  www.host1.com test-agent 2024-06-10 09:00:35 +0000 UTC} {us-central1 c  www.host2.com test-agent 2024-06-10 09:00:35 +0000 UTC}]]
+
+}

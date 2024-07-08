@@ -41,11 +41,11 @@ func AgentUri(traffic string, origin core.Origin) string {
 
 // NewAgent - create a new case officer agent
 func NewAgent(interval time.Duration, traffic string, origin core.Origin, handler messaging.Agent) messaging.Agent {
-	return newCaseAgent(interval, traffic, origin, handler)
+	return newAgent(interval, traffic, origin, handler)
 }
 
-// newCaseAgent - create a new case officer agent
-func newCaseAgent(interval time.Duration, traffic string, origin core.Origin, handler messaging.Agent) *caseOfficer {
+// newCAgent - create a new case officer agent
+func newAgent(interval time.Duration, traffic string, origin core.Origin, handler messaging.Agent) *caseOfficer {
 	c := new(caseOfficer)
 	c.uri = AgentUri(traffic, origin)
 	c.traffic = traffic
@@ -106,7 +106,7 @@ func (c *caseOfficer) Run() {
 	}
 	c.running = true
 	go runStatus(c, logActivity, insertAssignmentStatus)
-	go run(c, logActivity, assignment1.Update, newAgent)
+	go run(c, logActivity, assignment1.Update, newControllerAgent)
 }
 
 func logActivity(body []activity1.Entry) *core.Status {
@@ -128,7 +128,7 @@ func insertAssignmentStatus(msg *messaging.Message) *core.Status {
 	}, status)
 }
 
-func newAgent(traffic string, origin core.Origin, handler messaging.Agent) messaging.Agent {
+func newControllerAgent(traffic string, origin core.Origin, handler messaging.Agent) messaging.Agent {
 	if traffic == access.IngressTraffic {
 		return ingress1.NewControllerAgent(origin, handler)
 	}

@@ -3,6 +3,7 @@ package caseofficer1
 import (
 	"fmt"
 	"github.com/advanced-go/operations/activity1"
+	"github.com/advanced-go/operations/assignment1"
 	"github.com/advanced-go/stdlib/access"
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
@@ -52,22 +53,7 @@ func ExampleInsertAssignmentStatus() {
 
 }
 
-func ExampleUpdateAssignments() {
-	entries, status := updateAssignments(core.Origin{
-		Region:     "us-central1",
-		Zone:       "c",
-		SubZone:    "",
-		Host:       "",
-		InstanceId: "",
-	})
-	fmt.Printf("test: updateAssignments() -> [status:%v] [entries:%v]\n", status, entries)
-
-	//Output:
-	//test: updateAssignments() -> [status:OK] [entries:[{us-central1 c  www.host1.com 2024-06-10 09:00:35 +0000 UTC} {us-central1 c  www.host2.com 2024-06-10 09:00:35 +0000 UTC}]]
-
-}
-
-func ExampleNewAgent2() {
+func ExampleNewControllerAgent() {
 	origin := core.Origin{
 		Region:     "us-central1",
 		Zone:       "c",
@@ -75,15 +61,15 @@ func ExampleNewAgent2() {
 		Host:       "www.host1.com",
 		InstanceId: "",
 	}
-	a := newAgent(access.IngressTraffic, origin, nil)
-	fmt.Printf("test: newAgent(\"%v\") -> [%v]\n", access.IngressTraffic, a)
+	a := newControllerAgent(access.IngressTraffic, origin, nil)
+	fmt.Printf("test: newControllerAgent(\"%v\") -> [%v]\n", access.IngressTraffic, a)
 
-	a = newAgent(access.EgressTraffic, origin, nil)
-	fmt.Printf("test: newAgent(\"%v\") -> [%v]\n", access.EgressTraffic, a)
+	a = newControllerAgent(access.EgressTraffic, origin, nil)
+	fmt.Printf("test: newControllerAgent(\"%v\") -> [%v]\n", access.EgressTraffic, a)
 
 	//Output:
-	//test: newAgent("ingress") -> [ingress-controller1:us-central1.c.www.host1.com]
-	//test: newAgent("egress") -> [egress-controller1:us-central1.c.www.host1.com]
+	//test: newControllerAgent("ingress") -> [ingress-controller1:us-central1.c.www.host1.com]
+	//test: newControllerAgent("egress") -> [egress-controller1:us-central1.c.www.host1.com]
 
 }
 
@@ -96,14 +82,14 @@ func ExampleProcessAssignments() {
 		InstanceId: "",
 	}
 
-	c := newCaseAgent(time.Second*5, access.IngressTraffic, origin, nil)
-	fmt.Printf("test: newCaseAgent() -> [status:%v]\n", c != nil)
+	c := newAgent(time.Second*5, access.IngressTraffic, origin, nil)
+	fmt.Printf("test: newAgent() -> [status:%v]\n", c != nil)
 
-	status := processAssignments(c, logActivity, updateAssignments, newAgent)
+	status := processAssignments(c, logActivity, assignment1.Update, newControllerAgent)
 	fmt.Printf("test: processAssignments() -> [status:%v] [controllers:%v]\n", status, c.controllers.Count())
 
 	//Output:
-	//test: newCaseAgent() -> [status:true]
+	//test: newAgent() -> [status:true]
 	//test: processAssignments() -> [status:OK] [controllers:2]
 
 }
