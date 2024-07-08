@@ -36,7 +36,7 @@ func newAgent(region string) *logistics {
 	c := new(logistics)
 	c.uri = AgentUri(region)
 	c.region = region
-	c.interval = time.Second * 5
+	c.interval = time.Second * 2
 	c.caseOfficerInterval = time.Second * 5
 	c.ctrlC = make(chan *messaging.Message, messaging.ChannelSize)
 	c.caseOfficers = messaging.NewExchange()
