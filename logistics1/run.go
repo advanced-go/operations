@@ -7,7 +7,6 @@ import (
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
 	"net/url"
-	"sync"
 	"time"
 )
 
@@ -20,14 +19,18 @@ func run(l *logistics, log logFunc, query queryFunc, agent agentFunc) {
 	if l == nil {
 		return
 	}
-	var once sync.Once
-	tick := time.Tick(l.interval)
-
+	status := processAssignments(l, query, agent)
+	log(nil, l.uri, "process assignments : init")
+	if !status.OK() && !status.NotFound() {
+		log(nil, l.uri, status.Err)
+		// TODO : how to handle log error
+	}
+	l.StartTicker(0)
 	for {
 		select {
-		case <-tick:
+		case <-l.ticker.C:
 			// TODO : determine how to check for partition changes
-			log(nil, l.uri, "process assignments : onTick()")
+			log(nil, l.uri, "process assignments : tick")
 		case msg, open := <-l.ctrlC:
 			if !open {
 				return
@@ -35,19 +38,12 @@ func run(l *logistics, log logFunc, query queryFunc, agent agentFunc) {
 			switch msg.Event() {
 			case messaging.ShutdownEvent:
 				close(l.ctrlC)
+				l.StopTicker()
 				log(nil, l.uri, messaging.ShutdownEvent)
 				return
 			default:
 			}
 		default:
-			once.Do(func() {
-				status := processAssignments(l, query, agent)
-				log(nil, l.uri, "process assignments : default")
-				if !status.OK() && !status.NotFound() {
-					log(nil, l.uri, status.Err)
-					// TODO : how to handle log error
-				}
-			})
 		}
 	}
 }

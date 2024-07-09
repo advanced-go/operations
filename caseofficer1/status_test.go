@@ -44,7 +44,7 @@ func ExampleRunStatus() {
 
 	//Output:
 	//test: activity1.Log() -> 2024-07-08T14:30:07.973Z : case-officer1:ingress.us-central1.c : processing status message
-	//test: activity1.Log() -> 2024-07-08T14:30:08.975Z : case-officer1:ingress.us-central1.c : shutting down
+	//test: activity1.Log() -> 2024-07-08T14:30:08.975Z : case-officer1:ingress.us-central1.c : event:shutdown
 
 }
 
@@ -72,7 +72,7 @@ func ExampleRunStatus_Error() {
 
 	//Output:
 	//test: activity1.Log() -> 2024-07-08T14:35:38.921Z : case-officer1:ingress.us-central1.c : processing status message
-	//test: testAgent.Message() -> [status:Timeout [context deadline exceeded]] [chan:STATUS] [from:case-officer1:ingress.us-central1.c] [to:testAgent] [event:status]
-	//test: activity1.Log() -> 2024-07-08T14:35:39.925Z : case-officer1:ingress.us-central1.c : shutting down
+	//test: testAgent.Message() -> [chan:STATUS] [from:case-officer1:ingress.us-central1.c] [to:testAgent] [event:status] [status:Timeout [context deadline exceeded]]
+	//test: activity1.Log() -> 2024-07-08T14:35:39.925Z : case-officer1:ingress.us-central1.c : event:shutdown
 
 }

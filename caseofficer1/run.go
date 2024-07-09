@@ -8,8 +8,6 @@ import (
 	"github.com/advanced-go/stdlib/access"
 	"github.com/advanced-go/stdlib/core"
 	"github.com/advanced-go/stdlib/messaging"
-	"sync"
-	"time"
 )
 
 type logFunc func(ctx context.Context, agentId string, content any) *core.Status
@@ -21,13 +19,17 @@ func run(c *caseOfficer, log logFunc, update updateFunc, agent agentFunc) {
 	if c == nil {
 		return
 	}
-	var once sync.Once
-	tick := time.Tick(c.interval)
+	status := processAssignments(c, update, agent)
+	log(nil, c.uri, "process assignments : init")
+	if !status.OK() && !status.NotFound() {
+		c.handler.Message(messaging.NewStatusMessage(c.handler.Uri(), c.uri, status))
+	}
+	c.StartTicker(0)
 	for {
 		select {
-		case <-tick:
-			status := processAssignments(c, update, agent)
-			log(nil, c.uri, "process assignments : onTick()")
+		case <-c.ticker.C:
+			status = processAssignments(c, update, agent)
+			log(nil, c.uri, "process assignments : tick")
 			if !status.OK() && !status.NotFound() {
 				c.handler.Message(messaging.NewStatusMessage(c.handler.Uri(), c.uri, status))
 			}
@@ -38,18 +40,12 @@ func run(c *caseOfficer, log logFunc, update updateFunc, agent agentFunc) {
 			switch msg.Event() {
 			case messaging.ShutdownEvent:
 				close(c.ctrlC)
+				c.StopTicker()
 				log(nil, c.uri, messaging.ShutdownEvent)
 				return
 			default:
 			}
 		default:
-			once.Do(func() {
-				status := processAssignments(c, update, agent)
-				log(nil, c.uri, "process assignments : default")
-				if !status.OK() && !status.NotFound() {
-					c.handler.Message(messaging.NewStatusMessage(c.handler.Uri(), c.uri, status))
-				}
-			})
 		}
 	}
 }

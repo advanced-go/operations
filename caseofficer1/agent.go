@@ -17,6 +17,7 @@ type caseOfficer struct {
 	running     bool
 	uri         string
 	interval    time.Duration
+	ticker      *time.Ticker
 	traffic     string
 	origin      core.Origin
 	ctrlC       chan *messaging.Message
@@ -102,4 +103,20 @@ func (c *caseOfficer) Run() {
 	c.running = true
 	go runStatus(c, activity1.Log, insertAssignmentStatus)
 	go run(c, activity1.Log, assignment1.Update, newControllerAgent)
+}
+
+func (c *caseOfficer) StartTicker(interval time.Duration) {
+	if interval <= 0 {
+		interval = c.interval
+	} else {
+		c.interval = interval
+	}
+	if c.ticker != nil {
+		c.ticker.Stop()
+	}
+	c.ticker = time.NewTicker(interval)
+}
+
+func (c *caseOfficer) StopTicker() {
+	c.ticker.Stop()
 }

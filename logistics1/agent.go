@@ -16,6 +16,7 @@ type logistics struct {
 	uri                 string
 	region              string
 	interval            time.Duration
+	ticker              *time.Ticker
 	caseOfficerInterval time.Duration
 	ctrlC               chan *messaging.Message
 	caseOfficers        *messaging.Exchange
@@ -82,4 +83,20 @@ func (l *logistics) Run() {
 	l.running = true
 
 	go run(l, activity1.Log, queryAssignments, newCaseOfficerAgent)
+}
+
+func (l *logistics) StartTicker(interval time.Duration) {
+	if interval <= 0 {
+		interval = l.interval
+	} else {
+		l.interval = interval
+	}
+	if l.ticker != nil {
+		l.ticker.Stop()
+	}
+	l.ticker = time.NewTicker(interval)
+}
+
+func (l *logistics) StopTicker() {
+	l.ticker.Stop()
 }

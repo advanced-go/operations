@@ -73,7 +73,7 @@ func ExampleRun() {
 	fmt.Printf("test: exchange.Broadcast() -> [agents:%v]\n", c.controllers.List())
 
 	//Output:
-	//test: activity1.Log() -> 2024-07-08T15:06:51.286Z : case-officer1:ingress.us-central1.c : process assignments : default
+	//test: activity1.Log() -> 2024-07-08T15:06:51.286Z : case-officer1:ingress.us-central1.c : process assignments : init
 	//test: activity1.Log() -> 2024-07-08T15:06:53.288Z : case-officer1:ingress.us-central1.c : event:shutdown
 	//test: run() -> [agents:[ingress-controller1:us-central1.c.www.host1.com ingress-controller1:us-central1.c.www.host2.com]]
 	//test: exchange.Broadcast() -> [agents:[]]
