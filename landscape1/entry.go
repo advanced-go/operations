@@ -30,14 +30,14 @@ const (
 var (
 	safeEntry = common.NewSafe()
 	entryData = []Entry{
-		{Partition: 1, Region: "us-west1", Zone: "a", SubZone: "", Traffic: "ingress", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "east", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
-		{Partition: 2, Region: "us-west1", Zone: "b", SubZone: "", Traffic: "egress", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "east", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
-		{Partition: 3, Region: "us-south1", Zone: "b", SubZone: "", Traffic: "ingress", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "east", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
-		{Partition: 4, Region: "us-south1", Zone: "c", SubZone: "", Traffic: "egress", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "east", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
-		{Partition: 5, Region: "us-central1", Zone: "c", SubZone: "", Traffic: "ingress", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "west", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
-		{Partition: 6, Region: "us-central1", Zone: "c", SubZone: "", Traffic: "egress", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "west", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
-		{Partition: 7, Region: "us-central1", Zone: "d", SubZone: "", Traffic: "ingress", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "west", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
-		{Partition: 8, Region: "us-central1", Zone: "d", SubZone: "", Traffic: "egress", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "west", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Partition: 1, Region: "us-west1", Zone: "a", SubZone: "", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "east", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Partition: 2, Region: "us-west1", Zone: "b", SubZone: "", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "east", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Partition: 3, Region: "us-south1", Zone: "b", SubZone: "", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "east", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Partition: 4, Region: "us-south1", Zone: "c", SubZone: "", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "east", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Partition: 5, Region: "us-central1", Zone: "c", SubZone: "", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "west", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Partition: 6, Region: "us-central1", Zone: "c", SubZone: "", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "west", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Partition: 7, Region: "us-central1", Zone: "d", SubZone: "", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "west", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
+		{Partition: 8, Region: "us-central1", Zone: "d", SubZone: "", Status: "active", AssigneeClass: "case-officer1", AssignedRegion: "west", CreatedTS: time.Date(2024, 6, 10, 7, 120, 35, 0, time.UTC)},
 	}
 )
 
@@ -47,7 +47,6 @@ type Entry struct {
 	Region    string    `json:"region"`
 	Zone      string    `json:"zone"`
 	SubZone   string    `json:"sub-zone"`
-	Traffic   string    `json:"traffic"`
 	Status    string    `json:"status"` // active or inactive
 	AgentId   string    `json:"agent-id"`
 	CreatedTS time.Time `json:"created-ts"`
@@ -73,8 +72,8 @@ func (Entry) Scan(columnNames []string, values []any) (e Entry, err error) {
 		case SubZoneName:
 			e.SubZone = values[i].(string)
 
-		case TrafficName:
-			e.Traffic = values[i].(string)
+		//case TrafficName:
+		//	e.Traffic = values[i].(string)
 		case StatusName:
 			e.Status = values[i].(string)
 
@@ -98,7 +97,7 @@ func (e Entry) Values() []any {
 		e.Region,
 		e.Zone,
 		e.SubZone,
-		e.Traffic,
+		//e.Traffic,
 		e.Status,
 
 		e.AssigneeClass,
@@ -129,7 +128,7 @@ func validEntry(values url.Values, e Entry) bool {
 	if values == nil {
 		return false
 	}
-	if isValid(values.Get(StatusKey), e.Status) && isValid(values.Get(TrafficKey), e.Traffic) && isValid(values.Get(AssignedRegionKey), e.AssignedRegion) {
+	if isValid(values.Get(StatusKey), e.Status) && isValid(values.Get(AssignedRegionKey), e.AssignedRegion) {
 		return true
 	}
 	return false
